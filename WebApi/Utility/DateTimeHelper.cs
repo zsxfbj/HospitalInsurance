@@ -13,6 +13,9 @@ namespace HospitalInsurance.WebApi.Utility
         /// </summary>
         public const string DefaultDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
+        /// <summary>
+        /// 年月格式
+        /// </summary>
         public const string YYYYMM = "yyyyMM";
 
         /// <summary>

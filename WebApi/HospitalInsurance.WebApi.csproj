@@ -179,10 +179,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Model\Common\PageResult.cs" />
+    <Compile Include="Model\DTO\DivideReqDTO.cs" />
+    <Compile Include="Model\DTO\FeeItemDTO.cs" />
     <Compile Include="Model\DTO\GetPersonInfoReqDTO.cs" />
     <Compile Include="Model\DTO\LogPageReqDTO.cs" />
     <Compile Include="Model\Common\ServiceException.cs" />
     <Compile Include="Model\Common\ApiResult.cs" />
+    <Compile Include="Model\DTO\RecipeDTO.cs" />
     <Compile Include="Model\VO\PersonInfoVO.cs" />
     <Compile Include="Model\VO\RequestLogVO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -13,7 +13,7 @@ namespace HospitalInsurance.WebApi.BLL
     /// <summary>
     /// 医保接口
     /// </summary>
-    public class BHISInterface : Singleton< BHISInterface>
+    public class BHISInterface : Singleton<BHISInterface>
     {
         private readonly static string GatewayUrl = ConfigurationManager.AppSettings["GatewayUrl"].ToString();
 
@@ -26,16 +26,20 @@ namespace HospitalInsurance.WebApi.BLL
         /// <returns></returns>
         public PersonInfoVO GetPersonInfo(GetPersonInfoReqDTO req)
         {
+            if(BActionCheck.GetInstance().IsRepeat("GetPersonInfo-" + req.CardNumber))
+            {
+                throw new ServiceException { ResultCode = Enums.ResultCodeEnum.RepeatAction, ErrorMessage = "频繁的提交数据" };
+            }
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("<?xml version=\"1.0\" encoding=\"utf16\" standalone=\"yes\" ?>");
             sb.AppendLine("<root version=\"2.003\">");
             sb.AppendLine("\t<input name=\"GetPersonInfo\">");
-            sb.AppendLine("\t\t<card_no name=\""+req.CardNumber+"\"/>");
-            sb.AppendLine("\t\t<id_no name=\""+req.IdNumber+"\"/>");
-            sb.AppendLine("\t\t<personname name=\""+req.PersonName+"\"/>");
-            sb.AppendLine("\t\t<sex name=\""+req.Sex+"\"/>");
-            sb.AppendLine("\t\t<birthday name=\""+req.Birthday+"\"/>");
-            sb.AppendLine("\t\t<fundtype name=\""+req.FundType+"\" />");
+            sb.AppendLine("\t\t<card_no name=\"" + req.CardNumber + "\"/>");
+            sb.AppendLine("\t\t<id_no name=\"" + req.IdNumber + "\"/>");
+            sb.AppendLine("\t\t<personname name=\"" + req.PersonName + "\"/>");
+            sb.AppendLine("\t\t<sex name=\"" + req.Sex + "\"/>");
+            sb.AppendLine("\t\t<birthday name=\"" + req.Birthday + "\"/>");
+            sb.AppendLine("\t\t<fundtype name=\"" + req.FundType + "\" />");
             if (req.InHospital.HasValue)
             {
                 sb.AppendLine("\t\t<hospflag name=\"" + req.InHospital.Value + "\" />");
@@ -57,21 +61,21 @@ namespace HospitalInsurance.WebApi.BLL
             document.LoadXml(outXml);
             //获取根节点
             XmlNode rootNode = document.SelectSingleNode("root");
-            if(rootNode != null)
+            if (rootNode != null)
             {
                 //查询状态
                 XmlNode stateNode = rootNode.SelectSingleNode("state");
-                if (stateNode.Attributes["success"].Value.Equals( "true", System.StringComparison.OrdinalIgnoreCase))
+                if (stateNode.Attributes["success"].Value.Equals("true", System.StringComparison.OrdinalIgnoreCase))
                 {
                     //查询具体返回数据
                     XmlNode outPutNode = rootNode.SelectSingleNode("output");
-                    if(outPutNode == null)
+                    if (outPutNode == null)
                     {
                         ServiceException serviceException = new ServiceException
                         {
                             ResultCode = Enums.ResultCodeEnum.InterfaceError,
                             ErrorMessage = "无有效结果输出"
-                        };                        
+                        };
                         throw serviceException;
                     }
 
@@ -87,10 +91,8 @@ namespace HospitalInsurance.WebApi.BLL
                         //医保号
                         personInfo.IcNumber = GetSubNodeValue(icNode, "ic_no");
 
-
                         //姓名
                         personInfo.PersonName = GetSubNodeValue(icNode, "personname");
-                         
 
                         //性别
                         string sex = GetSubNodeValue(icNode, "sex");
@@ -108,11 +110,11 @@ namespace HospitalInsurance.WebApi.BLL
 
                         //险种类型
                         personInfo.FundType = GetSubNodeValue(icNode, "fundtype");
-                      
+
                     }
 
                     XmlNode netNode = outPutNode.SelectSingleNode("net");
-                    if(netNode != null)
+                    if (netNode != null)
                     {
                         //参保人员类别
                         personInfo.PersonType = GetSubNodeValue(netNode, "persontype");
@@ -150,9 +152,9 @@ namespace HospitalInsurance.WebApi.BLL
                         {
                             ResultCode = Enums.ResultCodeEnum.InterfaceError,
                             ErrorMessage = errorMessage.ToString()
-                        };                       
+                        };
                         throw serviceException;
-                    } 
+                    }
                     else
                     {
                         XmlNodeList warnNodes = rootNode.SelectNodes("warning");
@@ -166,12 +168,12 @@ namespace HospitalInsurance.WebApi.BLL
                         {
                             ResultCode = Enums.ResultCodeEnum.InterfaceError,
                             ErrorMessage = errorMessage.ToString()
-                        };                        
+                        };
                         throw serviceException;
                     }
                 }
             }
-           
+
 
             BRequestLog.GetInstance().SaveLog(JsonConvert.SerializeObject(req), personInfo);
             return personInfo;
@@ -189,9 +191,9 @@ namespace HospitalInsurance.WebApi.BLL
             XmlNode personTypeNode = parentNode.SelectSingleNode(nodeName);
             if (personTypeNode != null)
             {
-               return personTypeNode.Attributes[attributeName].Value;
+                return personTypeNode.Attributes[attributeName].Value;
             }
             return null;
-        }        
+        }
     }
 }

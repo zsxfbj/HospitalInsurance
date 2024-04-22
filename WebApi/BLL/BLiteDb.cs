@@ -15,12 +15,12 @@ namespace HospitalInsurance.WebApi.BLL
         /// <returns></returns>
         public string GetLogDbPath()
         {
-            string filePath = AppDomain.CurrentDomain.BaseDirectory + "/db/";
+            string filePath = AppDomain.CurrentDomain.BaseDirectory + "/db/" + DateTime.Now.Year + "/";
             if (!Directory.Exists(filePath))
             {
                 Directory.CreateDirectory(filePath);
             }
-            return filePath + DateTime.Now.Year + "/" + DateTime.Now.Month + "log.db";
+            return filePath + DateTime.Now.Month + "log.db";
         } 
     }
 }

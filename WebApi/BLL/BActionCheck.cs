@@ -16,23 +16,21 @@ namespace HospitalInsurance.WebApi.BLL
         /// <summary>
         /// 操作是否重复提交
         /// </summary>
-        /// <param name="requestData">请求的内容</param>
+        /// <param name="actionKey">行为key</param>
         /// <returns>bool</returns>
-        public bool IsRepeat(string requestData)
-        {             
-            string signValue = StringHelper.MD5Encrypt32(requestData);
-
-            if(SystemCache.Contains(signValue))
+        public bool IsRepeat(string actionKey)
+        {     
+            if(SystemCache.Contains(actionKey))
             {
-                return false;
+                return true;
             }
             var cacheItemPolicy = new CacheItemPolicy
             {
-                AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(3),
+                AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(2),
             };
-            SystemCache.Add(signValue, "缓存3秒过期", cacheItemPolicy);
+            SystemCache.Add(actionKey, "缓存2秒过期", cacheItemPolicy);
 
-            return true;
+            return false;
         }
 
     }

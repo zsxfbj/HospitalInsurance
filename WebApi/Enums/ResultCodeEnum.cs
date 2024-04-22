@@ -55,6 +55,13 @@ namespace HospitalInsurance.WebApi.Enums
         IsDeleted = 405,
 
         /// <summary>
+        /// 重复的请求
+        /// </summary>
+        [Description("重复的请求")]
+        [EnumMember(Value = "406")]
+        RepeatAction = 406,
+
+        /// <summary>
         /// 系统错误
         /// </summary>
         [Description("记录不存在")]
