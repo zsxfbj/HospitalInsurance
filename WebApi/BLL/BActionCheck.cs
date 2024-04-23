@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.Caching;
 using HospitalInsurance.Utility;
-using HospitalInsurance.WebApi.Utility;
 
 namespace HospitalInsurance.WebApi.BLL
 {
@@ -10,7 +9,7 @@ namespace HospitalInsurance.WebApi.BLL
     /// </summary>
     public class BActionCheck : Singleton<BActionCheck>
     {
-
+               
         private readonly static ObjectCache SystemCache = MemoryCache.Default;
 
         /// <summary>

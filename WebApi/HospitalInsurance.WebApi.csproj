@@ -186,8 +186,12 @@
     <Compile Include="Model\Common\ServiceException.cs" />
     <Compile Include="Model\Common\ApiResult.cs" />
     <Compile Include="Model\DTO\RecipeDTO.cs" />
-    <Compile Include="Model\VO\PersonInfoVO.cs" />
+    <Compile Include="Model\VO\FeeItemVO.cs" />
+    <Compile Include="Model\VO\PaymentVO.cs" />
+    <Compile Include="Model\VO\PersonVO.cs" />
     <Compile Include="Model\VO\RequestLogVO.cs" />
+    <Compile Include="Model\VO\SummaryPayVO.cs" />
+    <Compile Include="Model\VO\TradeVO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\Converter\DecimalConverter.cs" />
     <Compile Include="Utility\Converter\DefaultDateTimeConverter.cs" />

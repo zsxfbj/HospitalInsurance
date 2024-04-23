@@ -24,9 +24,9 @@ namespace HospitalInsurance.WebApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("get-person-info")]
-        public ApiResult<PersonInfoVO> GetPersonInfo([FromBody] GetPersonInfoReqDTO req)
+        public ApiResult<PersonVO> GetPersonInfo([FromBody] GetPersonInfoReqDTO req)
         {
-            return new ApiResult<PersonInfoVO>
+            return new ApiResult<PersonVO>
             {
                 Code = Enums.ResultCodeEnum.Success,
                 Data = BHISInterface.GetInstance().GetPersonInfo(req),

@@ -17,16 +17,16 @@ namespace HospitalInsurance.WebApi.BLL
     {
         private readonly static string GatewayUrl = ConfigurationManager.AppSettings["GatewayUrl"].ToString();
 
-        private static readonly HttpClient client = new HttpClient();
+        private static readonly HttpClient Client = new HttpClient();
 
         /// <summary>
-        /// 
+        /// 获取参保人员信息
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        public PersonInfoVO GetPersonInfo(GetPersonInfoReqDTO req)
+        public PersonVO GetPersonInfo(GetPersonInfoReqDTO req)
         {
-            if(BActionCheck.GetInstance().IsRepeat("GetPersonInfo-" + req.CardNumber))
+            if (BActionCheck.GetInstance().IsRepeat("GetPersonInfo-" + req.CardNumber))
             {
                 throw new ServiceException { ResultCode = Enums.ResultCodeEnum.RepeatAction, ErrorMessage = "频繁的提交数据" };
             }
@@ -44,6 +44,10 @@ namespace HospitalInsurance.WebApi.BLL
             {
                 sb.AppendLine("\t\t<hospflag name=\"" + req.InHospital.Value + "\" />");
             }
+            else
+            {
+                sb.AppendLine("\t\t<hospflag name=\"\" />");
+            }
             sb.AppendLine("\t</input>");
             sb.AppendLine("</root>");
             //HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");       
@@ -55,7 +59,7 @@ namespace HospitalInsurance.WebApi.BLL
             BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
 
             //定义输出结果
-            PersonInfoVO personInfo = new PersonInfoVO();
+            PersonVO personInfo = new PersonVO();
 
             XmlDocument document = new XmlDocument();
             document.LoadXml(outXml);

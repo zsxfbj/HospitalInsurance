@@ -6,7 +6,7 @@ namespace HospitalInsurance.WebApi.Model.VO
     /// <summary>
     /// 参保人员信息
     /// </summary>
-    public class PersonInfoVO
+    public class PersonVO
     {
         /// <summary>
         /// 社保卡卡号
