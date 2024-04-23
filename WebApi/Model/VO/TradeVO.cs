@@ -44,8 +44,17 @@ namespace HospitalInsurance.WebApi.Model.VO
         [JsonProperty("feeItems")]
         public List<FeeItemVO> FeeItems { get; set; }
 
+        /// <summary>
+        /// 分类汇总信息
+        /// </summary>
+        [JsonProperty("medicineCatalog")]
+        public MedicineCatalogVO MedicineCatalog { get; set; }
 
-
+        /// <summary>
+        /// 新单据分类汇总信息
+        /// </summary>
+        [JsonProperty("medicineCatalog2")]
+        public MedicineCatalog2VO medicineCatalog2 { get; set; }
 
     }
 }

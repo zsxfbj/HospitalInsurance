@@ -187,6 +187,8 @@
     <Compile Include="Model\Common\ApiResult.cs" />
     <Compile Include="Model\DTO\RecipeDTO.cs" />
     <Compile Include="Model\VO\FeeItemVO.cs" />
+    <Compile Include="Model\VO\MedicineCatalog2VO.cs" />
+    <Compile Include="Model\VO\MedicineCatalogVO.cs" />
     <Compile Include="Model\VO\PaymentVO.cs" />
     <Compile Include="Model\VO\PersonVO.cs" />
     <Compile Include="Model\VO\RequestLogVO.cs" />
