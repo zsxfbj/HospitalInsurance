@@ -83,7 +83,7 @@ namespace HospitalInsurance.WebApi.Model.VO
         /// </summary>
         [JsonProperty("commonServiceFee")]
         [JsonConverter(typeof(DecimalConverter))]
-        public decimal commonServiceFee {  get; set; }
+        public decimal CommonServiceFee {  get; set; }
 
         /// <summary>
         /// 挂号费

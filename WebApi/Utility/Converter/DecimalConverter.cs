@@ -58,7 +58,7 @@ namespace HospitalInsurance.WebApi.Utility.Converter
             if (value != null)
             {
                 decimal.TryParse(value.ToString(), out decimal destValue);
-                serializer.Serialize(writer, destValue.ToString("#0.##"));
+                serializer.Serialize(writer, destValue.ToString("#0.####"));
             }
             else
             {

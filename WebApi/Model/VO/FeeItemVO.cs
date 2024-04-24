@@ -69,23 +69,23 @@ namespace HospitalInsurance.WebApi.Model.VO
         /// <summary>
         /// 医保内总金额，精确到小数点2位
         /// </summary>
-        [JsonProperty("inInsuranceAmount")]
+        [JsonProperty("inInsuranceFee")]
         [JsonConverter(typeof(DecimalConverter))]
-        public decimal InInsuranceAmount { get; set; }
+        public decimal InInsuranceFee { get; set; }
 
         /// <summary>
         /// 医保外总金额，精确到小数点2位
         /// </summary>
-        [JsonProperty("outInsuranceAmount")]
+        [JsonProperty("outInsuranceFee")]
         [JsonConverter(typeof(DecimalConverter))]
-        public decimal OutInsuranceAmount { get; set; }
+        public decimal OutInsuranceFee { get; set; }
 
         /// <summary>
         /// 个人自付2金额
         /// </summary>
-        [JsonProperty("selfPayAmount")]
+        [JsonProperty("selfPayFee")]
         [JsonConverter(typeof(DecimalConverter))]
-        public decimal SelfPayAmount { get; set; }
+        public decimal SelfPayFee { get; set; }
 
         /// <summary>
         /// 分解状态，0-正常，1-不符合特殊标识，2-医保目录内不存在，3-对照错误，4-不符合特殊定额管理要求，5-未对照，6-医保外处方
@@ -103,8 +103,8 @@ namespace HospitalInsurance.WebApi.Model.VO
         /// 社区优惠金额
         /// </summary>
         [JsonConverter(typeof(DecimalConverter))]
-        [JsonProperty("preferentialAmount")]
-        public decimal PreferentialAmount { get; set; }
+        [JsonProperty("preferentialFee")]
+        public decimal PreferentialFee { get; set; }
 
         /// <summary>
         /// 整数，如优惠10%，则表示为“10

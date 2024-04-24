@@ -9,6 +9,12 @@ namespace HospitalInsurance.WebApi.Model.VO
     public class TradeVO
     {
         /// <summary>
+        /// 社保卡号
+        /// </summary>
+        [JsonProperty("cardNumber")]
+        public string CardNumber { get; set; }
+
+        /// <summary>
         /// 交易流水
         /// </summary>
         [JsonProperty("tradeNumber")]
@@ -54,7 +60,7 @@ namespace HospitalInsurance.WebApi.Model.VO
         /// 新单据分类汇总信息
         /// </summary>
         [JsonProperty("medicineCatalog2")]
-        public MedicineCatalog2VO medicineCatalog2 { get; set; }
+        public MedicineCatalog2VO MedicineCatalog2 { get; set; }
 
     }
 }

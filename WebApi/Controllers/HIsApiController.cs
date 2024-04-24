@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Http;
 using HospitalInsurance.WebApi.BLL;
 using HospitalInsurance.WebApi.Model.Common;
@@ -18,12 +15,12 @@ namespace HospitalInsurance.WebApi.Controllers
     {
 
         /// <summary>
-        /// 
+        /// 获取医保人员信息
         /// </summary>
-        /// <param name="req"></param>
-        /// <returns></returns>
+        /// <param name="req">获取医保人员信息请求</param>
+        /// <returns>PersonVO就医人员医保信息</returns>
         [HttpPost]
-        [Route("get-person-info")]
+        [Route("get-person")]
         public ApiResult<PersonVO> GetPersonInfo([FromBody] GetPersonInfoReqDTO req)
         {
             return new ApiResult<PersonVO>
@@ -33,5 +30,23 @@ namespace HospitalInsurance.WebApi.Controllers
                 RequestId = Guid.NewGuid().ToString()
             };
         }
+
+        /// <summary>
+        /// 获取医保人员信息
+        /// </summary>
+        /// <param name="req">获取医保人员信息请求</param>
+        /// <returns>PersonVO就医人员医保信息</returns>
+        [HttpPost]
+        [Route("divide")]
+        public ApiResult<TradeVO> Divide([FromBody] DivideReqDTO req)
+        {
+            return new ApiResult<TradeVO>
+            {
+                Code = Enums.ResultCodeEnum.Success,
+                Data = BHISInterface.GetInstance().DivideFee(req),
+                RequestId = Guid.NewGuid().ToString()
+            };
+        }
+
     }
 }
