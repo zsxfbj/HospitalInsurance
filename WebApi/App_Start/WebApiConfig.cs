@@ -21,7 +21,7 @@ namespace HospitalInsurance.WebApi
             config.Filters.Add(new ValidateModelAttribute());
             config.Filters.Add(new ExceptionHandlingAttribute());
 
-
+           
             // Web API 路由
             config.MapHttpAttributeRoutes();
 

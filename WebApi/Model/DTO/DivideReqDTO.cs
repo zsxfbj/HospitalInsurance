@@ -19,10 +19,10 @@ namespace HospitalInsurance.WebApi.Model.DTO
         public string CardNumber { get; set; }
 
         /// <summary>
-        /// 就诊类型，此处目前固定为17（互联网复诊费结算）
+        /// 医疗类别，此处目前固定为17（互联网复诊费结算）
         /// </summary>
-        [Required(ErrorMessage = "就诊类型必须填写")]
-        [MaxLength(2, ErrorMessage = "就诊类型2个字符")]
+        [Required(ErrorMessage = "医疗类别必须填写")]
+        [MaxLength(2, ErrorMessage = "医疗类别最多2个字符")]
         [JsonProperty("cureType")]
         public string CureType { get; set; }
 

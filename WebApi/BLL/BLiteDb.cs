@@ -20,7 +20,7 @@ namespace HospitalInsurance.WebApi.BLL
             {
                 Directory.CreateDirectory(filePath);
             }
-            return filePath + DateTime.Now.Month + "log.db";
+            return filePath + DateTime.Now.ToString("yyyyMM") + "log.db";
         } 
     }
 }

@@ -3,7 +3,6 @@ using System.Configuration;
 using System.Net.Http;
 using System.Text;
 using System.Xml;
-using Antlr.Runtime.Tree;
 using HospitalInsurance.Utility;
 using HospitalInsurance.WebApi.Model.Common;
 using HospitalInsurance.WebApi.Model.DTO;
@@ -21,6 +20,7 @@ namespace HospitalInsurance.WebApi.BLL
 
         private static readonly HttpClient Client = new HttpClient();
 
+        #region public PersonVO GetPersonInfo(GetPersonInfoReqDTO req)
         /// <summary>
         /// 获取参保人员信息
         /// </summary>
@@ -176,7 +176,9 @@ namespace HospitalInsurance.WebApi.BLL
             }
             
         }
+        #endregion public PersonVO GetPersonInfo(GetPersonInfoReqDTO req)
 
+        #region public TradeVO DivideFee(DivideReqDTO req)
         /// <summary>
         /// 费用分解
         /// </summary>
@@ -316,14 +318,14 @@ namespace HospitalInsurance.WebApi.BLL
                         XmlNode summaryPayNode = outPutNode.SelectSingleNode("sumpay");
                         if(summaryPayNode != null)
                         {
-                            GetSummaryPay(trade, summaryPayNode);
+                            trade.SummaryPay = GetSummaryPay(summaryPayNode);
                         }
 
                         //支付信息
                         XmlNode paymentNode = outPutNode.SelectSingleNode("payinfo");
                         if(paymentNode != null)
                         {
-                            GetPayment(trade, paymentNode);
+                            trade.Payment = GetPayment(paymentNode);
                         }
 
                         //分类汇总信息
@@ -355,7 +357,333 @@ namespace HospitalInsurance.WebApi.BLL
                 throw new ServiceException { ResultCode = Enums.ResultCodeEnum.InterfaceError, ErrorMessage = "HIS接口访问异常" };
             }
         }
+        #endregion public TradeVO DivideFee(DivideReqDTO req)
 
+        #region public TradeResultVO TradeConfirm(string cardNumber)
+        /// <summary>
+        /// 门诊交易确认
+        /// </summary>
+        /// <param name="cardNumber"></param>
+        /// <returns></returns>
+        public TradeResultVO TradeConfirm(string cardNumber)
+        {
+            if(string.IsNullOrEmpty(cardNumber) || cardNumber.Trim().Length != 12)
+            {
+                throw new ServiceException { ResultCode = Enums.ResultCodeEnum.RequestParamterError, ErrorMessage = "社保卡号格式错误" };
+            }
+
+            if (BActionCheck.GetInstance().IsRepeat("trade-" + cardNumber.Trim()))
+            {
+                throw new ServiceException { ResultCode = Enums.ResultCodeEnum.RepeatAction, ErrorMessage = "频繁的提交门诊交易确认查询请求" };
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<?xml version=\"1.0\" encoding=\"utf16\" standalone=\"yes\" ?>");
+            sb.AppendLine("<root version=\"2.003\">");
+            sb.AppendLine("\t<input name=\"Divide\">");
+            //用户信息
+            sb.AppendLine("\t\t<userinfo>");
+            sb.AppendLine("\t\t\t<card_no name=\"社保卡号\">" + cardNumber.Trim()  + "</card_no>");
+            sb.AppendLine("\t\t</userinfo>");
+            //结尾部分
+            sb.AppendLine("\t</input>");
+            sb.AppendLine("</root>");
+            try
+            {
+                HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
+                HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/Trade_Web", httpContent).Result;
+                string outXml = response.Content.ReadAsStringAsync().Result;
+
+                //string outXml = BTestAction.GetInstance().GetPersonInfoWeb(sb.ToString());
+                //记录医保网关的请求日志
+                BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
+
+                //定义输出结果
+                TradeResultVO tradeResult = new TradeResultVO
+                {
+                    CardNumber = cardNumber.Trim()
+                };
+
+                XmlDocument document = new XmlDocument();
+                document.LoadXml(outXml);
+                //获取根节点
+                XmlNode rootNode = document.SelectSingleNode("root");
+                if (rootNode != null)
+                {
+                    //查询状态
+                    XmlNode stateNode = rootNode.SelectSingleNode("state");
+                    if (stateNode.Attributes["success"].Value.Equals("true", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        //查询具体返回数据
+                        XmlNode outPutNode = rootNode.SelectSingleNode("output");
+                        if (outPutNode == null)
+                        {
+                            ServiceException serviceException = new ServiceException
+                            {
+                                ResultCode = Enums.ResultCodeEnum.InterfaceError,
+                                ErrorMessage = "无有效结果输出"
+                            };
+                            throw serviceException;
+                        }
+
+                        decimal.TryParse(GetSubNodeValue(outPutNode, "personcountaftersub"), out decimal amount);
+                        tradeResult.PersonAccountAfterSubtractAmount = amount;
+                        tradeResult.CertId = GetSubNodeValue(outPutNode, "certid");
+                        tradeResult.Sign = GetSubNodeValue(outPutNode, "sign");
+                    }
+                    else
+                    {
+                        GetErrorInfo(rootNode);
+                    }
+                }
+
+                BRequestLog.GetInstance().SaveLog("社保卡号：" + cardNumber, tradeResult);
+                return tradeResult;
+            }
+            catch (Exception e)
+            {
+                BRequestLog.GetInstance().SaveLog("社保卡号：" + cardNumber, e.Message);
+                throw new ServiceException { ResultCode = Enums.ResultCodeEnum.InterfaceError, ErrorMessage = "HIS接口访问异常" };
+            }
+        }
+        #endregion public TradeResultVO TradeConfirm(string cardNumber)
+
+        #region public RefundTradeVO GetRefundTrade(RefundFeeReqDTO req)
+        /// <summary>
+        /// 退费交易请求
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        public RefundTradeVO GetRefundTrade(RefundFeeReqDTO req)
+        {
+            if (BActionCheck.GetInstance().IsRepeat("refundment-" + req.CardNumber))
+            {
+                throw new ServiceException { ResultCode = Enums.ResultCodeEnum.RepeatAction, ErrorMessage = "频繁的提交退费分解请求" };
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<?xml version=\"1.0\" encoding=\"utf16\" standalone=\"yes\" ?>");
+            sb.AppendLine("<root version=\"2.003\">");
+            sb.AppendLine("\t<input name=\"Refundment\">");
+            //用户信息
+            sb.AppendLine("\t\t<userinfo>");
+            sb.AppendLine("\t\t\t<card_no name=\"社保卡号\">" + (string.IsNullOrEmpty(req.CardNumber) ? "" : req.CardNumber.Trim()) + "</card_no>");
+            sb.AppendLine("\t\t</userinfo>");
+            //交易信息
+            sb.AppendLine("\t\t<tradeinfo>");
+            sb.AppendLine("\t\t\t<tradeno name=\"交易流水号\">" + (string.IsNullOrEmpty(req.TradeNumber) ? "" : req.TradeNumber.Trim()) + "</tradeno>");
+            sb.AppendLine("\t\t\t<operator name=\"收费员\">" + (string.IsNullOrEmpty(req.Operator) ? "" : req.Operator.Trim()) + "</operator>");
+            sb.AppendLine("\t\t</tradeinfo>");
+            //结尾部分
+            sb.AppendLine("\t</input>");
+            sb.AppendLine("</root>");
+
+            try
+            {
+                HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
+                HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/Refundment_Web", httpContent).Result;
+                string outXml = response.Content.ReadAsStringAsync().Result;
+
+                
+                //记录医保网关的请求日志
+                BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
+
+                //定义输出结果
+                RefundTradeVO refundTrade = new RefundTradeVO
+                {
+                    CardNumber = req.CardNumber.Trim()
+                };
+
+                XmlDocument document = new XmlDocument();
+                document.LoadXml(outXml);
+                
+                //获取根节点
+                XmlNode rootNode = document.SelectSingleNode("root");
+                if (rootNode != null)
+                {
+                    //查询状态
+                    XmlNode stateNode = rootNode.SelectSingleNode("state");
+                    if (stateNode.Attributes["success"].Value.Equals("true", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        //查询具体返回数据
+                        XmlNode outPutNode = rootNode.SelectSingleNode("output");
+                        if (outPutNode == null)
+                        {
+                            ServiceException serviceException = new ServiceException
+                            {
+                                ResultCode = Enums.ResultCodeEnum.InterfaceError,
+                                ErrorMessage = "无有效结果输出"
+                            };
+                            throw serviceException;
+                        }
+
+                        XmlNode fullTradeNode = outPutNode.SelectSingleNode("fulltrade");
+                        if (fullTradeNode == null)
+                        {
+                            ServiceException serviceException = new ServiceException
+                            {
+                                ResultCode = Enums.ResultCodeEnum.InterfaceError,
+                                ErrorMessage = "无有效结果输出"
+                            };
+                            throw serviceException;
+                        }
+
+                        //交易信息
+                        XmlNode tradeNode = outPutNode.SelectSingleNode("tradeinfo");
+                        if (tradeNode != null)
+                        {
+                            //交易流水号
+                            refundTrade.TradeNumber = GetSubNodeValue(tradeNode, "tradeno");
+
+                            //交易流水号
+                            refundTrade.IllType = GetSubNodeValue(tradeNode, "illtype");
+
+                            //医保应用号
+                            refundTrade.IcNumber = GetSubNodeValue(tradeNode, "ic_no");
+
+                            //交易流水号
+                            refundTrade.CureType = GetSubNodeValue(tradeNode, "curetype");
+
+                            //交易日期
+                            refundTrade.TradeDate = GetSubNodeValue(tradeNode, "tradedate");
+                        }
+
+                        //费用明细
+                        XmlNode feeItemsNode = outPutNode.SelectSingleNode("feeitemarray");
+                        if (feeItemsNode != null)
+                        {
+                            refundTrade.FeeItems = new System.Collections.Generic.List<FeeItemVO>();
+                            foreach (XmlNode feeItemNode in feeItemsNode.ChildNodes)
+                            {
+                                //添加到计费明细项
+                                refundTrade.FeeItems.Add(GetFeeItemVO(feeItemNode));
+                            }
+                        }
+
+                        //汇总支付信息
+                        XmlNode summaryPayNode = outPutNode.SelectSingleNode("sumpay");
+                        if (summaryPayNode != null)
+                        {
+                            refundTrade.SummaryPay = GetSummaryPay(summaryPayNode);
+                        }
+
+                        //支付信息
+                        XmlNode paymentNode = outPutNode.SelectSingleNode("payinfo");
+                        if (paymentNode != null)
+                        {
+                            refundTrade.Payment = GetPayment(paymentNode);
+                        }
+                    }
+                    else
+                    {
+                        GetErrorInfo(rootNode);
+                    }
+                }
+
+             
+                return refundTrade;
+            }
+            catch (Exception e)
+            {
+                BRequestLog.GetInstance().SaveLog(JsonConvert.SerializeObject(req), e.Message);
+                throw new ServiceException { ResultCode = Enums.ResultCodeEnum.InterfaceError, ErrorMessage = "HIS接口访问异常" };
+            }
+        }
+        #endregion public RefundTradeVO GetRefundTrade(RefundFeeReqDTO req)
+
+        #region public TradeStateVO GetTradeState(string tradeNumber)
+        /// <summary>
+        /// 交易查询及回退
+        /// </summary>
+        /// <param name="tradeNumber"></param>
+        /// <returns></returns>
+        /// <exception cref="ServiceException"></exception>
+        public TradeStateVO GetTradeState(string tradeNumber)
+        {
+            if (string.IsNullOrEmpty(tradeNumber) || tradeNumber.Trim().Length > 22)
+            {
+                throw new ServiceException { ResultCode = Enums.ResultCodeEnum.RequestParamterError, ErrorMessage = "交易流水号格式错误" };
+            }
+            if (BActionCheck.GetInstance().IsRepeat("comfirm-trade-state-" + tradeNumber.Trim()))
+            {
+                throw new ServiceException { ResultCode = Enums.ResultCodeEnum.RepeatAction, ErrorMessage = "频繁的提交交易状态确认查询请求" };
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<?xml version=\"1.0\" encoding=\"utf16\" standalone=\"yes\" ?>");
+            sb.AppendLine("<root version=\"2.003\">");
+            sb.AppendLine("\t<input name=\"Divide\">");            
+            //用户信息            
+            sb.AppendLine("\t\t<tradeno name=\"交易流水号\">" + tradeNumber.Trim() + "</tradeno>");         
+            //结尾部分
+            sb.AppendLine("\t</input>");
+            sb.AppendLine("</root>");
+
+            try
+            {
+                HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
+                HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/CommitTradeState_Web", httpContent).Result;
+                string outXml = response.Content.ReadAsStringAsync().Result;
+
+                //string outXml = BTestAction.GetInstance().GetPersonInfoWeb(sb.ToString());
+                //记录医保网关的请求日志
+                BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
+
+                //定义输出结果
+                TradeStateVO tradeState = new TradeStateVO()
+                {
+                    TradeNumber = tradeNumber.Trim()
+                };
+
+                XmlDocument document = new XmlDocument();
+                document.LoadXml(outXml);
+                //获取根节点
+                XmlNode rootNode = document.SelectSingleNode("root");
+                if (rootNode != null)
+                {
+                    //查询状态
+                    XmlNode stateNode = rootNode.SelectSingleNode("state");
+                    if (stateNode.Attributes["success"].Value.Equals("true", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        //查询具体返回数据
+                        XmlNode outPutNode = rootNode.SelectSingleNode("output");
+                        if (outPutNode == null)
+                        {
+                            ServiceException serviceException = new ServiceException
+                            {
+                                ResultCode = Enums.ResultCodeEnum.InterfaceError,
+                                ErrorMessage = "无有效结果输出"
+                            };
+                            throw serviceException;
+                        }
+
+                        tradeState.State = GetSubNodeValue(outPutNode, "tradestate");
+                        if(tradeState.State.Equals("ok", StringComparison.OrdinalIgnoreCase))
+                        {
+                            tradeState.StateName = "交易成功";
+                        }
+                        else
+                        {
+                            tradeState.StateName = "交易撤销";
+                        }                        
+                    }
+                    else
+                    {
+                        GetErrorInfo(rootNode);
+                    }
+                }
+
+                BRequestLog.GetInstance().SaveLog("交易流水号：" + tradeNumber, tradeState);
+                return tradeState;
+            }
+            catch (Exception e)
+            {
+                BRequestLog.GetInstance().SaveLog("交易流水号：" + tradeNumber, e.Message);
+                throw new ServiceException { ResultCode = Enums.ResultCodeEnum.InterfaceError, ErrorMessage = "HIS接口访问异常" };
+            }
+        }
+        #endregion public TradeStateVO GetTradeState(string tradeNumber)
+
+        #region Private Methods
+
+        #region private FeeItemVO GetFeeItemVO(XmlNode feeItemNode)
         /// <summary>
         /// 
         /// </summary>
@@ -407,66 +735,75 @@ namespace HospitalInsurance.WebApi.BLL
 
             return feeItem;
         }
+        #endregion private FeeItemVO GetFeeItemVO(XmlNode feeItemNode)
 
+        #region private SummaryPayVO GetSummaryPay(XmlNode summaryPayNode)
         /// <summary>
         /// 
-        /// </summary>
-        /// <param name="trade"></param>
+        /// </summary>        
         /// <param name="summaryPayNode"></param>
-        private void GetSummaryPay(TradeVO trade, XmlNode summaryPayNode)
+        private SummaryPayVO GetSummaryPay(XmlNode summaryPayNode)
         {
-            trade.SummaryPay = new SummaryPayVO();
+            SummaryPayVO vo = new SummaryPayVO();
 
             decimal.TryParse(GetSubNodeValue(summaryPayNode, "feeall"), out decimal totalAmount);
-            trade.SummaryPay.TotalAmount = totalAmount;
+            vo.TotalAmount = totalAmount;
 
             decimal.TryParse(GetSubNodeValue(summaryPayNode, "fund"), out decimal fundAmount);
-            trade.SummaryPay.FundAmount = fundAmount;
+            vo.FundAmount = fundAmount;
 
             decimal.TryParse(GetSubNodeValue(summaryPayNode, "cash"), out decimal cashAmount);
-            trade.SummaryPay.CashAmount = cashAmount;
+            vo.CashAmount = cashAmount;
 
             decimal.TryParse(GetSubNodeValue(summaryPayNode, "personcountpay"), out decimal personAccountAmount);
-            trade.SummaryPay.PersonAccountAmount = personAccountAmount;
-        }
+            vo.PersonAccountAmount = personAccountAmount;
 
+            return vo;
+        }
+        #endregion private SummaryPayVO GetSummaryPay(XmlNode summaryPayNode)
+
+        #region private PaymentVO GetPayment(XmlNode paymentNode)
         /// <summary>
         /// 获取支付信息结果
         /// </summary>
         /// <param name="trade"></param>
         /// <param name="paymentNode"></param>
-        private void GetPayment(TradeVO trade, XmlNode paymentNode)
+        private PaymentVO GetPayment(XmlNode paymentNode)
         {
-            trade.Payment = new PaymentVO();
+            PaymentVO vo = new PaymentVO();
 
             decimal.TryParse(GetSubNodeValue(paymentNode, "mzfee"), out decimal totalAmount);
-            trade.Payment.TotalAmount = totalAmount;
+            vo.TotalAmount = totalAmount;
 
             decimal.TryParse(GetSubNodeValue(paymentNode, "mzfeein"), out decimal inInsuranceAmount);
-            trade.Payment.InInsuranceAmount = inInsuranceAmount;
+            vo.InInsuranceAmount = inInsuranceAmount;
 
             decimal.TryParse(GetSubNodeValue(paymentNode, "mzpayfirst"), out decimal firstPayAmount);
-            trade.Payment.FirstPayAmount = firstPayAmount;
+            vo.FirstPayAmount = firstPayAmount;
 
             decimal.TryParse(GetSubNodeValue(paymentNode, "mzselfpay2"), out decimal selfPayAmount);
-            trade.Payment.SelfPayAmount = selfPayAmount;
+            vo.SelfPayAmount = selfPayAmount;
 
             decimal.TryParse(GetSubNodeValue(paymentNode, "mzbigpay"), out decimal bigPayAmount);
-            trade.Payment.BigPayAmount = bigPayAmount;
+            vo.BigPayAmount = bigPayAmount;
 
             decimal.TryParse(GetSubNodeValue(paymentNode, "mzbigselfpay"), out decimal selfBigPayAmount);
-            trade.Payment.SelfBigPayAmount = selfBigPayAmount;
+            vo.SelfBigPayAmount = selfBigPayAmount;
 
             decimal.TryParse(GetSubNodeValue(paymentNode, "mzoutofbig"), out decimal outOfBigPayAmount);
-            trade.Payment.OutOfBigPayAmount = outOfBigPayAmount;
+            vo.OutOfBigPayAmount = outOfBigPayAmount;
 
             decimal.TryParse(GetSubNodeValue(paymentNode, "bcpay"), out decimal supplementaryPayAmount);
-            trade.Payment.SupplementaryPayAmount = supplementaryPayAmount;
+            vo.SupplementaryPayAmount = supplementaryPayAmount;
 
             decimal.TryParse(GetSubNodeValue(paymentNode, "jcbz"), out decimal militaryPayAmount);
-            trade.Payment.MilitaryPayAmount = militaryPayAmount;
-        }
+            vo.MilitaryPayAmount = militaryPayAmount;
 
+            return vo;
+        }
+        #endregion private PaymentVO GetPayment(XmlNode paymentNode)
+
+        #region private void GetMedicineCatalogVO(TradeVO trade, XmlNode medicineCatalogNode)
         /// <summary>
         /// 
         /// </summary>
@@ -530,7 +867,9 @@ namespace HospitalInsurance.WebApi.BLL
             decimal.TryParse(GetSubNodeValue(medicineCatalogNode, "other"), out decimal otherFee);
             trade.MedicineCatalog.OtherFee = otherFee;
         }
+        #endregion private void GetMedicineCatalogVO(TradeVO trade, XmlNode medicineCatalogNode)
 
+        #region private void GetMedicineCatalog2VO(TradeVO trade, XmlNode medicineCatalog2Node)
         /// <summary>
         /// 
         /// </summary>
@@ -579,6 +918,9 @@ namespace HospitalInsurance.WebApi.BLL
             decimal.TryParse(GetSubNodeValue(medicineCatalog2Node, "otheropfee"), out decimal otherOperationFee);
             trade.MedicineCatalog2.OtherOperationFee = otherOperationFee;
         }
+        #endregion private void GetMedicineCatalog2VO(TradeVO trade, XmlNode medicineCatalog2Node)
+
+        #region private string GetSubNodeValue(XmlNode parentNode, string nodeName)
         /// <summary>
         /// 查询指定节点下，指定名称节点的值
         /// </summary>
@@ -595,7 +937,9 @@ namespace HospitalInsurance.WebApi.BLL
             }
             return null;
         }
+        #endregion private string GetSubNodeValue(XmlNode parentNode, string nodeName)
 
+        #region private void GetErrorInfo(XmlNode rootNode)
         /// <summary>
         /// 读取错误信息并输出
         /// </summary>
@@ -635,5 +979,8 @@ namespace HospitalInsurance.WebApi.BLL
                 throw serviceException;
             }
         }
+        #endregion private void GetErrorInfo(XmlNode rootNode)
+
+        #endregion Private Methods
     }
 }
