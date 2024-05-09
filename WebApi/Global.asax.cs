@@ -1,5 +1,4 @@
 using System.Web.Http;
-using HospitalInsurance.WebApi.Filters;
 
 namespace HospitalInsurance.WebApi
 {

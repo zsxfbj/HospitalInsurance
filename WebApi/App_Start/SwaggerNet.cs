@@ -40,7 +40,7 @@ namespace HospitalInsurance.WebApi.App_Start
             try
             {
                 config.Services.Replace(typeof(IDocumentationProvider),
-                    new XmlCommentDocumentationProvider(HttpContext.Current.Server.MapPath("~/bin/HospitalInsurance.WebApi.XML")));
+                    new XmlCommentDocumentationProvider(String.Format(@"{0}\\bin\\HospitalInsurance.WebApi.XML", AppDomain.CurrentDomain.BaseDirectory)));
             }
             catch (FileNotFoundException)
             {

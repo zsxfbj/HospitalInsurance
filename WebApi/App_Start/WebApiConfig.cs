@@ -17,6 +17,10 @@ namespace HospitalInsurance.WebApi
         /// <param name="config"></param>
         public static void Register(HttpConfiguration config)
         {
+            ////支持cookie跨域问题
+            //EnableCrossSiteRequests(config);
+        
+
             // Web API 配置和服务
             config.Filters.Add(new ValidateModelAttribute());
             config.Filters.Add(new ExceptionHandlingAttribute());

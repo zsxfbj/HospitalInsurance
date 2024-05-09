@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Net.Http;
+using System.Runtime.Caching;
 using System.Text;
 using System.Xml;
 using HospitalInsurance.Utility;
@@ -8,6 +9,7 @@ using HospitalInsurance.WebApi.Model.Common;
 using HospitalInsurance.WebApi.Model.DTO;
 using HospitalInsurance.WebApi.Model.VO;
 using Newtonsoft.Json;
+using WebRegComLib;
 
 namespace HospitalInsurance.WebApi.BLL
 {
@@ -16,10 +18,15 @@ namespace HospitalInsurance.WebApi.BLL
     /// </summary>
     public class BHISInterface : Singleton<BHISInterface>
     {
-        private readonly static string GatewayUrl = ConfigurationManager.AppSettings["GatewayUrl"].ToString();
+        //private readonly static string GatewayUrl = ConfigurationManager.AppSettings["GatewayUrl"].ToString();
 
-        private static readonly HttpClient Client = new HttpClient();
+        private readonly static ObjectCache SystemCache = MemoryCache.Default;
 
+
+        //private static readonly HttpClient Client = new HttpClient();
+
+        private const string WebRegClassKey = "webreg-";
+  
         #region public PersonVO GetPersonInfo(GetPersonInfoReqDTO req)
         /// <summary>
         /// 获取参保人员信息
@@ -32,6 +39,10 @@ namespace HospitalInsurance.WebApi.BLL
             {
                 throw new ServiceException { ResultCode = Enums.ResultCodeEnum.RepeatAction, ErrorMessage = "频繁的提交获取参保人员信息" };
             }
+
+           
+
+
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("<?xml version=\"1.0\" encoding=\"utf16\" standalone=\"yes\" ?>");
             sb.AppendLine("<root version=\"2.003\">");
@@ -68,11 +79,14 @@ namespace HospitalInsurance.WebApi.BLL
             sb.AppendLine("</root>");
             try
             {
-                HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
-                HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/GetPersonInfo_Web", httpContent).Result;
-                string outXml = response.Content.ReadAsStringAsync().Result;
 
+                //HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
+                //HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/GetPersonInfo_Web", httpContent).Result;
+                //string outXml = response.Content.ReadAsStringAsync().Result;
+               
                 //string outXml = BTestAction.GetInstance().GetPersonInfoWeb(sb.ToString());
+                GetWebRegClass(req.CardNumber).GetPersonInfo_Web(sb.ToString(), out string outXml);
+               
                 //记录医保网关的请求日志
                 BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
 
@@ -252,11 +266,12 @@ namespace HospitalInsurance.WebApi.BLL
 
             try
             {
-                HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
-                HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/Divide_Web", httpContent).Result;
-                string outXml = response.Content.ReadAsStringAsync().Result;
+                //HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
+                //HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/Divide_Web", httpContent).Result;
+                //string outXml = response.Content.ReadAsStringAsync().Result;
 
                 //string outXml = BTestAction.GetInstance().GetPersonInfoWeb(sb.ToString());
+                GetWebRegClass(req.CardNumber).Divide_Web(sb.ToString(), out string outXml);
                 //记录医保网关的请求日志
                 BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
 
@@ -389,11 +404,12 @@ namespace HospitalInsurance.WebApi.BLL
             sb.AppendLine("</root>");
             try
             {
-                HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
-                HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/Trade_Web", httpContent).Result;
-                string outXml = response.Content.ReadAsStringAsync().Result;
+                //HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
+                //HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/Trade_Web", httpContent).Result;
+                //string outXml = response.Content.ReadAsStringAsync().Result;
 
                 //string outXml = BTestAction.GetInstance().GetPersonInfoWeb(sb.ToString());
+                GetWebRegClass(cardNumber).Trade_Web(out string outXml);
                 //记录医保网关的请求日志
                 BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
 
@@ -478,10 +494,10 @@ namespace HospitalInsurance.WebApi.BLL
 
             try
             {
-                HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
-                HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/Refundment_Web", httpContent).Result;
-                string outXml = response.Content.ReadAsStringAsync().Result;
-
+                //HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
+                // HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/Refundment_Web", httpContent).Result;
+                //string outXml = response.Content.ReadAsStringAsync().Result;
+                GetWebRegClass(req.CardNumber).Refundment_Web(sb.ToString(), out string outXml);
                 
                 //记录医保网关的请求日志
                 BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
@@ -618,10 +634,10 @@ namespace HospitalInsurance.WebApi.BLL
 
             try
             {
-                HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
-                HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/CommitTradeState_Web", httpContent).Result;
-                string outXml = response.Content.ReadAsStringAsync().Result;
-
+                //HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
+                //HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/CommitTradeState_Web", httpContent).Result;
+                //string outXml = response.Content.ReadAsStringAsync().Result;
+                GetWebRegClass("").CommitTradeState_Web(tradeNumber, out string outXml);
                 //string outXml = BTestAction.GetInstance().GetPersonInfoWeb(sb.ToString());
                 //记录医保网关的请求日志
                 BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
@@ -766,7 +782,6 @@ namespace HospitalInsurance.WebApi.BLL
         /// <summary>
         /// 获取支付信息结果
         /// </summary>
-        /// <param name="trade"></param>
         /// <param name="paymentNode"></param>
         private PaymentVO GetPayment(XmlNode paymentNode)
         {
@@ -980,6 +995,28 @@ namespace HospitalInsurance.WebApi.BLL
             }
         }
         #endregion private void GetErrorInfo(XmlNode rootNode)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cardNumber"></param>
+        /// <returns></returns>
+        private WebRegClass GetWebRegClass(string cardNumber)
+        {
+            string key = WebRegClassKey + cardNumber;
+
+            if (SystemCache.Contains(key))
+            {                
+                return (WebRegClass)SystemCache.Get(key);
+            }
+            WebRegClass webReg = new WebRegClass();
+            var cacheItemPolicy = new CacheItemPolicy
+            {
+                AbsoluteExpiration = DateTimeOffset.Now.AddHours(4),
+            };
+            SystemCache.Set(key, webReg, cacheItemPolicy);
+            return webReg;
+        }
 
         #endregion Private Methods
     }

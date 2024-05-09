@@ -15,7 +15,7 @@ namespace HospitalInsurance.WebApi.Model.VO
         public string CardNumber { get; set; }
 
         /// <summary>
-        /// 交易流水
+        /// 退款交易流水号
         /// </summary>
         [JsonProperty("tradeNumber")]
         public string TradeNumber { get; set; }
