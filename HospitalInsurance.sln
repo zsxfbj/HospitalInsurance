@@ -7,6 +7,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalInsurance.WebApi", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalInsurance.TestDemoApp", "TestDemoApp\HospitalInsurance.TestDemoApp.csproj", "{AC4A3946-972A-4703-861E-0617D245AA6B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalInsurance.Enums", "Enums\HospitalInsurance.Enums.csproj", "{ECD5D364-C875-4550-990A-5C105C9B735A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalInsurance.Model", "Model\HospitalInsurance.Model.csproj", "{5BB7F686-FCD5-43FC-AEBF-815C47529A9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalInsurance.Utility", "Utility\HospitalInsurance.Utility.csproj", "{A46340EE-1CE5-4B25-8BA0-A2352D40BEC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalInsurance.Entity", "Entity\HospitalInsurance.Entity.csproj", "{94E18342-7B77-4433-B77C-A4FF7F5B2072}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalInsurance.BLL", "BLL\HospitalInsurance.BLL.csproj", "{FD632311-2F7F-418A-AA51-7EC2178434E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +31,26 @@ Global
 		{AC4A3946-972A-4703-861E-0617D245AA6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC4A3946-972A-4703-861E-0617D245AA6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC4A3946-972A-4703-861E-0617D245AA6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECD5D364-C875-4550-990A-5C105C9B735A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECD5D364-C875-4550-990A-5C105C9B735A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECD5D364-C875-4550-990A-5C105C9B735A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECD5D364-C875-4550-990A-5C105C9B735A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BB7F686-FCD5-43FC-AEBF-815C47529A9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BB7F686-FCD5-43FC-AEBF-815C47529A9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BB7F686-FCD5-43FC-AEBF-815C47529A9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BB7F686-FCD5-43FC-AEBF-815C47529A9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A46340EE-1CE5-4B25-8BA0-A2352D40BEC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A46340EE-1CE5-4B25-8BA0-A2352D40BEC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A46340EE-1CE5-4B25-8BA0-A2352D40BEC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A46340EE-1CE5-4B25-8BA0-A2352D40BEC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94E18342-7B77-4433-B77C-A4FF7F5B2072}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94E18342-7B77-4433-B77C-A4FF7F5B2072}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94E18342-7B77-4433-B77C-A4FF7F5B2072}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94E18342-7B77-4433-B77C-A4FF7F5B2072}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD632311-2F7F-418A-AA51-7EC2178434E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD632311-2F7F-418A-AA51-7EC2178434E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD632311-2F7F-418A-AA51-7EC2178434E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD632311-2F7F-418A-AA51-7EC2178434E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

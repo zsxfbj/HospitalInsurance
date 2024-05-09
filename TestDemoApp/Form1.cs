@@ -10,15 +10,15 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WebRegComLib;
+using HospitalInsurance.BLL;
+using HospitalInsurance.Model.DTO;
+using Newtonsoft.Json;
 
 namespace HospitalInsurance.TestDemoApp
 {
     public partial class Form1 : Form
     {
         private static readonly HttpClient Client = new HttpClient();
-
-        private WebRegClass wr = null;
 
         private static readonly String appDoc = Environment.CurrentDirectory;
 
@@ -142,14 +142,14 @@ namespace HospitalInsurance.TestDemoApp
             SaveGetPersonReq();
             try
             {
-                tbGetPersonResp.Text = "";
-                wr.GetPersonInfo_Web(tbGetPersonReq.Text, out string outXml);
-                HttpContent httpContent = new StringContent(tbGetPersonReq.Text, Encoding.UTF8, "application/json");
-                string url = tbGatewayUrl.Text.Trim() + "/api/net-yb/get-person";
-                HttpResponseMessage response = Client.PostAsync(url, httpContent).Result;
-                tbGetPersonResp.AppendText("请求地址：" + url);
-                tbGetPersonResp.AppendText(Environment.NewLine);
-                tbGetPersonResp.AppendText(response.Content.ReadAsStringAsync().Result);
+                tbGetPersonResp.Text = JsonConvert.SerializeObject(BHISInterface.GetInstance().GetPersonInfo(JsonConvert.DeserializeObject<GetPersonInfoReqDTO>(tbGetPersonReq.Text)));
+                
+                //HttpContent httpContent = new StringContent(tbGetPersonReq.Text, Encoding.UTF8, "application/json");
+                //string url = tbGatewayUrl.Text.Trim() + "/api/net-yb/get-person";
+                //HttpResponseMessage response = Client.PostAsync(url, httpContent).Result;
+                //tbGetPersonResp.AppendText("请求地址：" + url);
+                //tbGetPersonResp.AppendText(Environment.NewLine);
+                //tbGetPersonResp.AppendText(response.Content.ReadAsStringAsync().Result);
             }
             catch (Exception ex)
             {
@@ -164,7 +164,7 @@ namespace HospitalInsurance.TestDemoApp
         {
             SaveGatewayUrl();
             SaveLogPageReq();
-
+            tbLogPageResp.Text = "";
             try
             {              
                 HttpContent httpContent = new StringContent(tbLogPageReq.Text, Encoding.UTF8, "application/json");
@@ -181,9 +181,6 @@ namespace HospitalInsurance.TestDemoApp
             }
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            wr = new WebRegClass();
-        }
+       
     }
 }

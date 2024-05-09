@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Web.Http;
-using HospitalInsurance.WebApi.BLL;
-using HospitalInsurance.WebApi.Model.Common;
-using HospitalInsurance.WebApi.Model.DTO;
-using HospitalInsurance.WebApi.Model.VO;
+using HospitalInsurance.BLL;
+using HospitalInsurance.Model.Common;
+using HospitalInsurance.Model.DTO;
+using HospitalInsurance.Model.VO;
 
 namespace HospitalInsurance.WebApi.Controllers
 {

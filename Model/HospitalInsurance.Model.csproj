@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AC4A3946-972A-4703-861E-0617D245AA6B}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
-    <RootNamespace>HospitalInsurance.TestDemoApp</RootNamespace>
-    <AssemblyName>TestDemoApp</AssemblyName>
+    <ProjectGuid>{5BB7F686-FCD5-43FC-AEBF-815C47529A9B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Model</RootNamespace>
+    <AssemblyName>Model</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -34,68 +32,42 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="Common\ApiResult.cs" />
+    <Compile Include="Common\PageResult.cs" />
+    <Compile Include="Common\ServiceException.cs" />
+    <Compile Include="DTO\DivideReqDTO.cs" />
+    <Compile Include="DTO\FeeItemDTO.cs" />
+    <Compile Include="DTO\GetPersonInfoReqDTO.cs" />
+    <Compile Include="DTO\LogPageReqDTO.cs" />
+    <Compile Include="DTO\RecipeDTO.cs" />
+    <Compile Include="DTO\RefundFeeReqDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
+    <Compile Include="VO\FeeItemVO.cs" />
+    <Compile Include="VO\MedicineCatalog2VO.cs" />
+    <Compile Include="VO\MedicineCatalogVO.cs" />
+    <Compile Include="VO\PaymentVO.cs" />
+    <Compile Include="VO\PersonVO.cs" />
+    <Compile Include="VO\RefundTradeVO.cs" />
+    <Compile Include="VO\RequestLogVO.cs" />
+    <Compile Include="VO\SummaryPayVO.cs" />
+    <Compile Include="VO\TradeResultVO.cs" />
+    <Compile Include="VO\TradeStateVO.cs" />
+    <Compile Include="VO\TradeVO.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BLL\HospitalInsurance.BLL.csproj">
-      <Project>{fd632311-2f7f-418a-aa51-7ec2178434e5}</Project>
-      <Name>HospitalInsurance.BLL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Entity\HospitalInsurance.Entity.csproj">
-      <Project>{94e18342-7b77-4433-b77c-a4ff7f5b2072}</Project>
-      <Name>HospitalInsurance.Entity</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Enums\HospitalInsurance.Enums.csproj">
       <Project>{ecd5d364-c875-4550-990a-5c105c9b735a}</Project>
       <Name>HospitalInsurance.Enums</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Model\HospitalInsurance.Model.csproj">
-      <Project>{5bb7f686-fcd5-43fc-aebf-815c47529a9b}</Project>
-      <Name>HospitalInsurance.Model</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utility\HospitalInsurance.Utility.csproj">
       <Project>{a46340ee-1ce5-4b25-8ba0-a2352d40bec4}</Project>

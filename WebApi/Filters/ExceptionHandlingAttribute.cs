@@ -2,7 +2,7 @@
 using System.Web.Http.Filters;
 using Newtonsoft.Json;
 using System.Net;
-using HospitalInsurance.WebApi.Model.Common;
+using HospitalInsurance.Model.Common;
 using System.Text;
 
 namespace HospitalInsurance.WebApi.Filters
