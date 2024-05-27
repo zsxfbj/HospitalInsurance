@@ -9,26 +9,18 @@ namespace HospitalInsurance.BLL
     /// </summary>
     public class BActionCheck : Singleton<BActionCheck>
     {
-               
-        private readonly static ObjectCache SystemCache = MemoryCache.Default;
-
         /// <summary>
         /// 操作是否重复提交
         /// </summary>
         /// <param name="actionKey">行为key</param>
         /// <returns>bool</returns>
         public bool IsRepeat(string actionKey)
-        {     
-            if(SystemCache.Contains(actionKey))
+        {
+            if (MemoryCache.Default.Contains(actionKey))
             {
                 return true;
             }
-            var cacheItemPolicy = new CacheItemPolicy
-            {
-                AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(2),
-            };
-            SystemCache.Add(actionKey, "缓存2秒过期", cacheItemPolicy);
-
+            MemoryCache.Default.Set(actionKey, "1", new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(2) });
             return false;
         }
 

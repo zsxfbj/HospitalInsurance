@@ -4,8 +4,8 @@ using System.Net.Http;
 using System.Text;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using HospitalInsurance.WebApi.Enums;
-using HospitalInsurance.WebApi.Model.Common;
+using HospitalInsurance.Enums;
+using HospitalInsurance.Model.Common;
 using Newtonsoft.Json;
 
 namespace HospitalInsurance.WebApi.Filters

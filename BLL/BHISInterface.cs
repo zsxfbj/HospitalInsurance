@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Caching;
 using System.Text;
 using System.Xml;
 using HospitalInsurance.Utility;
@@ -7,7 +6,7 @@ using HospitalInsurance.Model.Common;
 using HospitalInsurance.Model.DTO;
 using HospitalInsurance.Model.VO;
 using Newtonsoft.Json;
-using WebRegComLib;
+using HospitalInsurance.Enums;
 
 namespace HospitalInsurance.BLL
 {
@@ -16,15 +15,7 @@ namespace HospitalInsurance.BLL
     /// </summary>
     public class BHISInterface : Singleton<BHISInterface>
     {
-        //private readonly static string GatewayUrl = ConfigurationManager.AppSettings["GatewayUrl"].ToString();
-
-        private readonly static ObjectCache SystemCache = MemoryCache.Default;
-
-
-        //private static readonly HttpClient Client = new HttpClient();
-
-        private const string WebRegClassKey = "webreg-";
-  
+           
         #region public PersonVO GetPersonInfo(GetPersonInfoReqDTO req)
         /// <summary>
         /// 获取参保人员信息
@@ -33,14 +24,11 @@ namespace HospitalInsurance.BLL
         /// <returns></returns>
         public PersonVO GetPersonInfo(GetPersonInfoReqDTO req)
         {
-            if (BActionCheck.GetInstance().IsRepeat("GetPersonInfo-" + req.CardNumber))
+            if (BActionCheck.GetInstance().IsRepeat("get-person-" + req.CardNumber))
             {
-                throw new ServiceException { ResultCode = Enums.ResultCodeEnum.RepeatAction, ErrorMessage = "频繁的提交获取参保人员信息" };
+                throw new ServiceException { ResultCode = ResultCodeEnum.RepeatAction, ErrorMessage = "频繁的提交获取参保人员信息" };
             }
-
-           
-
-
+                      
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("<?xml version=\"1.0\" encoding=\"utf16\" standalone=\"yes\" ?>");
             sb.AppendLine("<root version=\"2.003\">");
@@ -59,19 +47,19 @@ namespace HospitalInsurance.BLL
             //{
             //    sb.AppendLine("\t\t<hospflag name=\"\" />");
             //}
-            sb.AppendLine("\t\t<card_no name=\"社保卡卡号\">" + (string.IsNullOrEmpty(req.CardNumber) ? "" : req.CardNumber.Trim()) + "</card_no>");
-            sb.AppendLine("\t\t<id_no name=\"公民身份号码\">" + (string.IsNullOrEmpty(req.IdNumber) ? "" : req.IdNumber.Trim()) + "</id_no>");
-            sb.AppendLine("\t\t<personname name=\"姓名\">" + (string.IsNullOrEmpty(req.PersonName) ? "" : req.PersonName.Trim()).Trim() + "</personname>");
-            sb.AppendLine("\t\t<sex name=\"性别\">" + req.Sex + "</sex>");
-            sb.AppendLine("\t\t<birthday name=\"出生日期\">" + (string.IsNullOrEmpty(req.Birthday) ? "" : req.Birthday.Trim()) + "</birthday>");
-            sb.AppendLine("\t\t<fundtype name=\"险种类型\">" + (string.IsNullOrEmpty(req.FundType) ? "" : req.FundType.Trim()) + "</fundtype>");
+            sb.AppendLine("\t\t<card_no>" + (string.IsNullOrEmpty(req.CardNumber) ? "" : req.CardNumber.Trim()) + "</card_no>");
+            sb.AppendLine("\t\t<id_no>" + (string.IsNullOrEmpty(req.IdNumber) ? "" : req.IdNumber.Trim()) + "</id_no>");
+            sb.AppendLine("\t\t<personname>" + (string.IsNullOrEmpty(req.PersonName) ? "" : req.PersonName.Trim()).Trim() + "</personname>");
+            sb.AppendLine("\t\t<sex>" + req.Sex + "</sex>");
+            sb.AppendLine("\t\t<birthday>" + (string.IsNullOrEmpty(req.Birthday) ? "" : req.Birthday.Trim()) + "</birthday>");
+            sb.AppendLine("\t\t<fundtype>" + (string.IsNullOrEmpty(req.FundType) ? "" : req.FundType.Trim()) + "</fundtype>");
             if (req.InHospital.HasValue)
             {
-                sb.AppendLine("\t\t<hospflag name=\"是否在院\">" + req.InHospital.Value + "</hospflag>");
+                sb.AppendLine("\t\t<hospflag>" + req.InHospital.Value + "</hospflag>");
             }
             else
             {
-                sb.AppendLine("\t\t<hospflag name=\"是否在院\" />");
+                sb.AppendLine("\t\t<hospflag/>");
             }
             sb.AppendLine("\t</input>");
             sb.AppendLine("</root>");
@@ -81,10 +69,10 @@ namespace HospitalInsurance.BLL
                 //HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
                 //HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/GetPersonInfo_Web", httpContent).Result;
                 //string outXml = response.Content.ReadAsStringAsync().Result;
-               
+
                 //string outXml = BTestAction.GetInstance().GetPersonInfoWeb(sb.ToString());
-                GetWebRegClass(req.CardNumber).GetPersonInfo_Web(sb.ToString(), out string outXml);
-               
+                //wrc.GetPersonInfo_Web(sb.ToString(), out string outXml);
+                string outXml = "";
                 //记录医保网关的请求日志
                 BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
 
@@ -107,7 +95,7 @@ namespace HospitalInsurance.BLL
                         {
                             ServiceException serviceException = new ServiceException
                             {
-                                ResultCode = Enums.ResultCodeEnum.InterfaceError,
+                                ResultCode = ResultCodeEnum.InterfaceError,
                                 ErrorMessage = "无有效结果输出"
                             };
                             throw serviceException;
@@ -176,15 +164,13 @@ namespace HospitalInsurance.BLL
                         GetErrorInfo(rootNode);
                     }
                 }
-
-
                 BRequestLog.GetInstance().SaveLog(JsonConvert.SerializeObject(req), personInfo);
                 return personInfo;
             }
             catch(Exception e)
             {
                 BRequestLog.GetInstance().SaveLog(JsonConvert.SerializeObject(req), e.Message);
-                throw new ServiceException { ResultCode = Enums.ResultCodeEnum.InterfaceError, ErrorMessage = "HIS接口访问异常" };
+                throw new ServiceException { ResultCode = ResultCodeEnum.InterfaceError, ErrorMessage = "HIS接口访问异常" };
             }
             
         }
@@ -208,15 +194,15 @@ namespace HospitalInsurance.BLL
             sb.AppendLine("\t<input name=\"Divide\">");
             //用户信息
             sb.AppendLine("\t\t<userinfo>");
-            sb.AppendLine("\t\t\t<card_no name=\"社保卡号\">" + (string.IsNullOrEmpty(req.CardNumber) ? "" : req.CardNumber.Trim()) + "</card_no>");
+            sb.AppendLine("\t\t\t<card_no>" + (string.IsNullOrEmpty(req.CardNumber) ? "" : req.CardNumber.Trim()) + "</card_no>");
             sb.AppendLine("\t\t</userinfo>");
 
             //交易信息
             sb.AppendLine("\t\t<tradeinfo>");
-            sb.AppendLine("\t\t\t<curetype name=\"就诊类型\">" + (string.IsNullOrEmpty(req.CureType) ? "" : req.CureType.Trim()) + "</curetype>");
-            sb.AppendLine("\t\t\t<illtype name=\"就诊方式 0普通 其他未启用\">" + (string.IsNullOrEmpty(req.IllType) ? "" : req.IllType.Trim()) + "</illtype> ");
-            sb.AppendLine("\t\t\t<feeno name=\"收费单据号\">" + (string.IsNullOrEmpty(req.FeeNumber) ? "" : req.FeeNumber.Trim()) + "</feeno>");
-            sb.AppendLine("\t\t\t<operator name=\"收费员\">" + (string.IsNullOrEmpty(req.Operator) ? "" : req.Operator.Trim()) + "</feeno>");
+            sb.AppendLine("\t\t\t<curetype>" + (string.IsNullOrEmpty(req.CureType) ? "" : req.CureType.Trim()) + "</curetype>");
+            sb.AppendLine("\t\t\t<illtype>" + (string.IsNullOrEmpty(req.IllType) ? "" : req.IllType.Trim()) + "</illtype> ");
+            sb.AppendLine("\t\t\t<feeno>" + (string.IsNullOrEmpty(req.FeeNumber) ? "" : req.FeeNumber.Trim()) + "</feeno>");
+            sb.AppendLine("\t\t\t<operator>" + (string.IsNullOrEmpty(req.Operator) ? "" : req.Operator.Trim()) + "</feeno>");
             sb.AppendLine("\t\t</tradeinfo>");
 
             //处方列表
@@ -226,22 +212,22 @@ namespace HospitalInsurance.BLL
                 foreach (var recipe in req.Recipes)
                 {
                     sb.AppendLine("\t\t\t<recipe>");
-                    sb.AppendLine("\t\t\t\t<diagnoseno name=\"诊断序号\">" + (string.IsNullOrEmpty(recipe.DiagnoseNumber) ? "" : recipe.DiagnoseNumber.Trim()) + "</diagnoseno>");
-                    sb.AppendLine("\t\t\t\t<recipeno name=\"处方序号\">" + (string.IsNullOrEmpty(recipe.RecipeNumber) ? "" : recipe.RecipeNumber.Trim()) + "</recipeno>");
-                    sb.AppendLine("\t\t\t\t<recipedate name=\"处方日期时间\">" + (string.IsNullOrEmpty(recipe.RecipeDate) ? "" : recipe.RecipeDate.Trim()) + "</recipedate>");
-                    sb.AppendLine("\t\t\t\t<diagnosename name=\"诊断名称\">" + (string.IsNullOrEmpty(recipe.DiagnoseName) ? "" : recipe.DiagnoseName.Trim()) + "</diagnosename>");
-                    sb.AppendLine("\t\t\t\t<diagnosecode name=\"诊断名称\">" + (string.IsNullOrEmpty(recipe.DiagnoseCode) ? "" : recipe.DiagnoseCode.Trim()) + "</diagnosecode>");
-                    sb.AppendLine("\t\t\t\t<medicalrecord name=\"病历信息\">" + (string.IsNullOrEmpty(recipe.MedicalRecord) ? "" : recipe.MedicalRecord.Trim()) + "</medicalrecord>");
-                    sb.AppendLine("\t\t\t\t<sectioncode name=\"就诊科别代码\">" + (string.IsNullOrEmpty(recipe.SectionCode) ? "" : recipe.SectionCode.Trim()) + "</sectioncode>");
-                    sb.AppendLine("\t\t\t\t<sectionname name=\"就诊科别名称\">" + (string.IsNullOrEmpty(recipe.SectionName) ? "" : recipe.SectionName.Trim()) + "</sectionname>");
-                    sb.AppendLine("\t\t\t\t<hissectionname name=\"HIS就诊科别名称\">" + (string.IsNullOrEmpty(recipe.HisSectionName) ? "" : recipe.HisSectionName.Trim()) + "</hissectionname>");
-                    sb.AppendLine("\t\t\t\t<drid name=\"医师编号\">" + (string.IsNullOrEmpty(recipe.DoctorId) ? "" : recipe.DoctorId.Trim()) + "</drid>");
-                    sb.AppendLine("\t\t\t\t<drname name=\"医师姓名\">" + (string.IsNullOrEmpty(recipe.DoctorName) ? "" : recipe.DoctorName.Trim()) + "</drname>");
-                    sb.AppendLine("\t\t\t\t<recipetype name=\"处方类别（1：医保内处方 2：医保外处方）\">" + recipe.RecipeType + "</recipetype>");
-                    sb.AppendLine("\t\t\t\t<helpmedicineflag name=\"代开药标识\">" + (string.IsNullOrEmpty(recipe.HelpMedicineFlag) ? "" : recipe.HelpMedicineFlag.Trim()) + "</helpmedicineflag>");
-                    sb.AppendLine("\t\t\t\t<remark name=\"代开药标识\">" + (string.IsNullOrEmpty(recipe.Remark) ? "" : recipe.Remark.Trim()) + "</remark>");
-                    sb.AppendLine("\t\t\t\t<registertradeno name=\"挂号交易流水号\">" + (string.IsNullOrEmpty(recipe.RegisterTradeNumber) ? "" : recipe.RegisterTradeNumber.Trim()) + "</registertradeno>");
-                    sb.AppendLine("\t\t\t\t<billstype name=\"单据类型（1-挂号）\">" + (string.IsNullOrEmpty(recipe.BillsType) ? "" : recipe.BillsType.Trim()) + "</billstype>");
+                    sb.AppendLine("\t\t\t\t<diagnoseno>" + (string.IsNullOrEmpty(recipe.DiagnoseNumber) ? "" : recipe.DiagnoseNumber.Trim()) + "</diagnoseno>");
+                    sb.AppendLine("\t\t\t\t<recipeno>" + (string.IsNullOrEmpty(recipe.RecipeNumber) ? "" : recipe.RecipeNumber.Trim()) + "</recipeno>");
+                    sb.AppendLine("\t\t\t\t<recipedate>" + (string.IsNullOrEmpty(recipe.RecipeDate) ? "" : recipe.RecipeDate.Trim()) + "</recipedate>");
+                    sb.AppendLine("\t\t\t\t<diagnosename>" + (string.IsNullOrEmpty(recipe.DiagnoseName) ? "" : recipe.DiagnoseName.Trim()) + "</diagnosename>");
+                    sb.AppendLine("\t\t\t\t<diagnosecode>" + (string.IsNullOrEmpty(recipe.DiagnoseCode) ? "" : recipe.DiagnoseCode.Trim()) + "</diagnosecode>");
+                    sb.AppendLine("\t\t\t\t<medicalrecord>" + (string.IsNullOrEmpty(recipe.MedicalRecord) ? "" : recipe.MedicalRecord.Trim()) + "</medicalrecord>");
+                    sb.AppendLine("\t\t\t\t<sectioncode>" + (string.IsNullOrEmpty(recipe.SectionCode) ? "" : recipe.SectionCode.Trim()) + "</sectioncode>");
+                    sb.AppendLine("\t\t\t\t<sectionname>" + (string.IsNullOrEmpty(recipe.SectionName) ? "" : recipe.SectionName.Trim()) + "</sectionname>");
+                    sb.AppendLine("\t\t\t\t<hissectionname>" + (string.IsNullOrEmpty(recipe.HisSectionName) ? "" : recipe.HisSectionName.Trim()) + "</hissectionname>");
+                    sb.AppendLine("\t\t\t\t<drid>" + (string.IsNullOrEmpty(recipe.DoctorId) ? "" : recipe.DoctorId.Trim()) + "</drid>");
+                    sb.AppendLine("\t\t\t\t<drname>" + (string.IsNullOrEmpty(recipe.DoctorName) ? "" : recipe.DoctorName.Trim()) + "</drname>");
+                    sb.AppendLine("\t\t\t\t<recipetype>" + recipe.RecipeType + "</recipetype>");
+                    sb.AppendLine("\t\t\t\t<helpmedicineflag>" + (string.IsNullOrEmpty(recipe.HelpMedicineFlag) ? "" : recipe.HelpMedicineFlag.Trim()) + "</helpmedicineflag>");
+                    sb.AppendLine("\t\t\t\t<remark>" + (string.IsNullOrEmpty(recipe.Remark) ? "" : recipe.Remark.Trim()) + "</remark>");
+                    sb.AppendLine("\t\t\t\t<registertradeno>" + (string.IsNullOrEmpty(recipe.RegisterTradeNumber) ? "" : recipe.RegisterTradeNumber.Trim()) + "</registertradeno>");
+                    sb.AppendLine("\t\t\t\t<billstype>" + (string.IsNullOrEmpty(recipe.BillsType) ? "" : recipe.BillsType.Trim()) + "</billstype>");
                     sb.AppendLine("\t\t\t</recipe>");
                 }
             }
@@ -269,15 +255,13 @@ namespace HospitalInsurance.BLL
                 //string outXml = response.Content.ReadAsStringAsync().Result;
 
                 //string outXml = BTestAction.GetInstance().GetPersonInfoWeb(sb.ToString());
-                GetWebRegClass(req.CardNumber).Divide_Web(sb.ToString(), out string outXml);
+                //wrc.Divide_Web(sb.ToString(), out string outXml);
                 //记录医保网关的请求日志
+                string outXml = "";
                 BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
 
                 //定义输出结果
-                TradeVO trade = new TradeVO
-                {
-                    CardNumber = req.CardNumber
-                };
+                TradeVO trade = new TradeVO();
 
                 XmlDocument document = new XmlDocument();
                 document.LoadXml(outXml);
@@ -287,7 +271,7 @@ namespace HospitalInsurance.BLL
                 {
                     //查询状态
                     XmlNode stateNode = rootNode.SelectSingleNode("state");
-                    if (stateNode.Attributes["success"].Value.Equals("true", System.StringComparison.OrdinalIgnoreCase))
+                    if (stateNode.Attributes["success"].Value.Equals("true", StringComparison.OrdinalIgnoreCase))
                     {
                         //查询具体返回数据
                         XmlNode outPutNode = rootNode.SelectSingleNode("output");
@@ -295,7 +279,7 @@ namespace HospitalInsurance.BLL
                         {
                             ServiceException serviceException = new ServiceException
                             {
-                                ResultCode = Enums.ResultCodeEnum.InterfaceError,
+                                ResultCode = ResultCodeEnum.InterfaceError,
                                 ErrorMessage = "无有效结果输出"
                             };
                             throw serviceException;
@@ -367,7 +351,7 @@ namespace HospitalInsurance.BLL
             catch (Exception e)
             {
                 BRequestLog.GetInstance().SaveLog(JsonConvert.SerializeObject(req), e.Message);
-                throw new ServiceException { ResultCode = Enums.ResultCodeEnum.InterfaceError, ErrorMessage = "HIS接口访问异常" };
+                throw new ServiceException { ResultCode = ResultCodeEnum.InterfaceError, ErrorMessage = "HIS接口访问异常" };
             }
         }
         #endregion public TradeVO DivideFee(DivideReqDTO req)
@@ -406,8 +390,9 @@ namespace HospitalInsurance.BLL
                 //HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/Trade_Web", httpContent).Result;
                 //string outXml = response.Content.ReadAsStringAsync().Result;
 
+                string outXml = "";
                 //string outXml = BTestAction.GetInstance().GetPersonInfoWeb(sb.ToString());
-                GetWebRegClass(cardNumber).Trade_Web(out string outXml);
+                //wrc.Trade_Web(out string outXml);
                 //记录医保网关的请求日志
                 BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
 
@@ -496,8 +481,9 @@ namespace HospitalInsurance.BLL
                 //HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
                 // HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/Refundment_Web", httpContent).Result;
                 //string outXml = response.Content.ReadAsStringAsync().Result;
-                GetWebRegClass(req.CardNumber).Refundment_Web(sb.ToString(), out string outXml);
-                
+                //wrc.Refundment_Web(sb.ToString(), out string outXml);
+
+                string outXml = "";
                 //记录医保网关的请求日志
                 BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
 
@@ -636,7 +622,8 @@ namespace HospitalInsurance.BLL
                 //HttpContent httpContent = new StringContent(sb.ToString(), Encoding.UTF8, "application/xml");
                 //HttpResponseMessage response = Client.PostAsync(GatewayUrl + "/ybapi/CommitTradeState_Web", httpContent).Result;
                 //string outXml = response.Content.ReadAsStringAsync().Result;
-                GetWebRegClass("").CommitTradeState_Web(tradeNumber, out string outXml);
+                //wrc.CommitTradeState_Web(tradeNumber, out string outXml);
+                string outXml = "";
                 //string outXml = BTestAction.GetInstance().GetPersonInfoWeb(sb.ToString());
                 //记录医保网关的请求日志
                 BRequestLog.GetInstance().SaveLog(sb.ToString(), outXml);
@@ -994,29 +981,7 @@ namespace HospitalInsurance.BLL
             }
         }
         #endregion private void GetErrorInfo(XmlNode rootNode)
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cardNumber"></param>
-        /// <returns></returns>
-        private WebRegClass GetWebRegClass(string cardNumber)
-        {
-            string key = WebRegClassKey + cardNumber;
-
-            if (SystemCache.Contains(key))
-            {                
-                return (WebRegClass)SystemCache.Get(key);
-            }
-            WebRegClass webReg = new WebRegClass();
-            var cacheItemPolicy = new CacheItemPolicy
-            {
-                AbsoluteExpiration = DateTimeOffset.Now.AddHours(4),
-            };
-            SystemCache.Set(key, webReg, cacheItemPolicy);
-            return webReg;
-        }
-
+                 
         #endregion Private Methods
     }
 }
