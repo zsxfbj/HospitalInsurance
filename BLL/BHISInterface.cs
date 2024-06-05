@@ -22,7 +22,7 @@ namespace HospitalInsurance.BLL
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        public PersonVO GetPersonInfo(GetPersonInfoReqDTO req)
+        public PersonVO GetPersonInfo(PersonInfoReqDTO req)
         {
             if (BActionCheck.GetInstance().IsRepeat("get-person-" + req.CardNumber))
             {

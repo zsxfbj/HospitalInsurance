@@ -6,7 +6,7 @@ namespace HospitalInsurance.Model.DTO
     /// <summary>
     /// 请求获取参保人员信息
     /// </summary>
-    public class GetPersonInfoReqDTO
+    public class PersonInfoReqDTO
     {
         /// <summary>
         /// 社保卡卡号

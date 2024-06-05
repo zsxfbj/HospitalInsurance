@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hospitalinsurance.Entity
 {
@@ -18,6 +14,7 @@ namespace Hospitalinsurance.Entity
         /// 操作流水号
         /// </summary>
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long ActionId { get; set; }
 
         /// <summary>

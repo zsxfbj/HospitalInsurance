@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using HospitalInsurance.Utility.Converter;
 using Newtonsoft.Json;
 
 namespace HospitalInsurance.Model.DTO
@@ -10,50 +11,28 @@ namespace HospitalInsurance.Model.DTO
     public class DivideReqDTO
     {
         /// <summary>
-        /// 社保卡卡号
+        /// 参保人员信息
         /// </summary>
-        [Required(ErrorMessage = "社保卡卡号必须填写")]
-        //[MaxLength(12, ErrorMessage = "社保卡卡号为12位数字")]
-        [RegularExpression(pattern: "^[1-9]\\d{11}$", ErrorMessage = "社保卡卡号为12位数字")]
-        [JsonProperty("cardNumber")]
-        public string CardNumber { get; set; }
-
-        /// <summary>
-        /// 医疗类别，此处目前固定为17（互联网复诊费结算）
-        /// </summary>
-        [Required(ErrorMessage = "医疗类别必须填写")]
-        //[MaxLength(2, ErrorMessage = "医疗类别最多2个字符")]
-        [JsonProperty("cureType")]
-        public string CureType { get; set; }
-
-        /// <summary>
-        /// 就诊方式，目前都是0普通，取值须在字典范围内，且严禁使用汉字
-        /// </summary>
-        [Required(ErrorMessage = "就诊方式必须填写")]
-        //[MaxLength(2, ErrorMessage = "就诊方式2个字符")]
-        [JsonProperty("illType")]
-        public string IllType { get; set; }
+        [JsonProperty("person")]
+        [Required(ErrorMessage = "参保人员信息必须填写")]
+        public PersonInfoReqDTO Person { get; set; }
 
         /// <summary>
         /// 收费单据号
         /// </summary>
         [JsonProperty("feeNumber")]
-        //[MaxLength(20, ErrorMessage = "收费单据号最多20个字符")]
         public string FeeNumber { get; set; }
 
         /// <summary>
         /// 收费员
         /// </summary>
         [JsonProperty("operator")]
-        //[MaxLength(20, ErrorMessage = "收费员最多20个字")]
         public string Operator { get; set; }
 
 
         /// <summary>
         /// 处方时间，格式为yyyyMMddHHmmss
         /// </summary>      
-        [Required(ErrorMessage = "处方时间必须填写")]
-        [MaxLength(14, ErrorMessage = "处方时间为14个字符")]
         [JsonProperty("recipeDate")]
         public string RecipeDate { get; set; }
 
@@ -82,16 +61,30 @@ namespace HospitalInsurance.Model.DTO
         public string DoctorName { get; set; }
 
         /// <summary>
-        /// 处方信息列表
-        /// </summary>
-        [JsonProperty("recipes")]
-        public List<RecipeDTO> Recipes { get; set; }
+        /// HIS项目代码：药品、诊疗项目或服务设施编码
+        /// </summary>       
+        [JsonProperty("hisCode")]
+        public string HisCode { get; set; }
 
         /// <summary>
-        /// 明细信息列表
-        /// </summary>
-        [JsonProperty("feeItems")]
-        public List<FeeItemDTO> FeeItems { get; set; }
+        /// HIS项目名称，本医院项目名称
+        /// </summary>      
+        [JsonProperty("itemName")]
+        public string ItemName { get; set; }
+
+        /// <summary>
+        /// 单价，最多4位小数
+        /// </summary>       
+        [JsonConverter(typeof(DecimalConverter))]
+        [JsonProperty("unitPrice")]
+        public decimal UnitPrice { get; set; }
+
+        /// <summary>
+        /// 项目总金额，该项目总金额，最多4位小数
+        /// </summary>       
+        [JsonConverter(typeof(DecimalConverter))]
+        [JsonProperty("fee")]
+        public decimal Fee { get; set; }
 
     }
 }

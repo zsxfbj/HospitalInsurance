@@ -6,17 +6,14 @@ namespace HospitalInsurance.Model.DTO
     /// <summary>
     /// 退费请求内容
     /// </summary>
-    public class RefundFeeReqDTO
+    public class RefundmentReqDTO
     {
         /// <summary>
-        /// 社保卡卡号
+        /// 人员信息
         /// </summary>
-        [Required(ErrorMessage = "社保卡卡号必须填写")]
-        //[MaxLength(12, ErrorMessage = "社保卡卡号为12位数字")]
-        [RegularExpression(pattern: "^[1-9]\\d{11}$", ErrorMessage = "社保卡卡号为12位数字")]
-        [JsonProperty("cardNumber")]
-        public string CardNumber { get; set; }
-
+        [Required(ErrorMessage = "人员信息必须填写")]
+        [JsonProperty("person")]
+        public PersonInfoReqDTO Person { get; set; }
 
         /// <summary>
         /// 原交易流水号

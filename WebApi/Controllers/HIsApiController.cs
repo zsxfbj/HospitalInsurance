@@ -21,7 +21,7 @@ namespace HospitalInsurance.WebApi.Controllers
         /// <returns>PersonVO就医人员医保信息</returns>
         [HttpPost]
         [Route("get-person")]
-        public ApiResult<PersonVO> GetPersonInfo([FromBody] GetPersonInfoReqDTO req)
+        public ApiResult<PersonVO> GetPersonInfo([FromBody] PersonInfoReqDTO req)
         {
             return new ApiResult<PersonVO>
             {

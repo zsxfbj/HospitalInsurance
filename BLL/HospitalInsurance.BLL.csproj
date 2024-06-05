@@ -51,10 +51,14 @@
   <ItemGroup>
     <Compile Include="BActionCheck.cs" />
     <Compile Include="BHISInterface.cs" />
-    <Compile Include="BRequestLog.cs" />
+    <Compile Include="BSubmitLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Entity\HospitalInsurance.Entity.csproj">
+      <Project>{94e18342-7b77-4433-b77c-a4ff7f5b2072}</Project>
+      <Name>HospitalInsurance.Entity</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Enums\HospitalInsurance.Enums.csproj">
       <Project>{ECD5D364-C875-4550-990A-5C105C9B735A}</Project>
       <Name>HospitalInsurance.Enums</Name>
@@ -69,6 +73,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="EntityFramework">
+      <Version>6.4.4</Version>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
     </PackageReference>

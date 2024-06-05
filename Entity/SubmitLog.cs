@@ -14,6 +14,7 @@ namespace Hospitalinsurance.Entity
         /// 自增Id
         /// </summary>
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]   
         public long Id { get; set; }
 
         /// <summary>
