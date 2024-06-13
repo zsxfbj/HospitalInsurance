@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using HospitalInsurance.Enums;
 using Newtonsoft.Json;
 
@@ -33,17 +32,10 @@ namespace HospitalInsurance.Model.Common
         public string ErrorMessage { get; set; }
 
         /// <summary>
-        /// 返回的请求Id
-        /// </summary>
-        [JsonProperty("requestId")]
-        public string RequestId { get; set; }
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         public ApiResult()
-        {
-            RequestId = Guid.NewGuid().ToString();
+        {           
             Code = ResultCodeEnum.Success;
             ErrorMessage = "请求成功";
             Data = default;
@@ -54,8 +46,7 @@ namespace HospitalInsurance.Model.Common
         /// </summary>
         /// <param name="value"></param>
         public ApiResult(T value)
-        {
-            RequestId = Guid.NewGuid().ToString();
+        {           
             Code = ResultCodeEnum.Success;
             ErrorMessage = "请求成功";
             Data = value;
@@ -70,8 +61,7 @@ namespace HospitalInsurance.Model.Common
         public static ApiResult<T> Error(ResultCodeEnum resultCode, string errorMessage)
         {
             ApiResult<T> result = new ApiResult<T>
-            {
-                RequestId = Guid.NewGuid().ToString(),
+            {               
                 Code = resultCode,
                 ErrorMessage = errorMessage,
                 Data = default

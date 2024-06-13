@@ -14,13 +14,14 @@ namespace Hospitalinsurance.Entity
         /// 自增Id
         /// </summary>
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]   
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
         /// <summary>
-        /// 访问的Ip
+        /// 请求业务Id
         /// </summary>
-        public string ClientIp { get; set; }
+        public string RequestId { get; set; }
+
 
         /// <summary>
         /// 提交类型：1-费用分解；2-退费申请；3-查询交易状态
@@ -58,7 +59,7 @@ namespace Hospitalinsurance.Entity
         public SubmitLog()
         {
             Id = 0;
-            ClientIp = "127.0.0.1";
+            RequestId = Guid.NewGuid().ToString();
             SubmitType = 1;
             SubmitContent = "";
             ResultContent = "";
