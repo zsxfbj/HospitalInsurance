@@ -9,12 +9,6 @@ namespace HospitalInsurance.Model.VO
     public class TradeResultVO
     {
         /// <summary>
-        /// 社保卡号
-        /// </summary>
-        [JsonProperty("cardNumber")]
-        public string CardNumber { get; set; }
-
-        /// <summary>
         /// 本次结算后个人帐户余额，精确到小数点2位
         /// </summary>
         [JsonProperty("afterSubtractAmount")]
