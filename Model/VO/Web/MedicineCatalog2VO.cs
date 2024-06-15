@@ -1,7 +1,7 @@
 ﻿using HospitalInsurance.Utility.Converter;
 using Newtonsoft.Json;
 
-namespace HospitalInsurance.Model.VO
+namespace HospitalInsurance.Model.VO.Web
 {
     /// <summary>
     /// 新单据分类汇总信息

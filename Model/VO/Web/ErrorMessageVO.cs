@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace HospitalInsurance.Model.VO
+namespace HospitalInsurance.Model.VO.Web
 {
     /// <summary>
     /// 警告信息视图

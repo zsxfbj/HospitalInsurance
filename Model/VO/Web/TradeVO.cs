@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace HospitalInsurance.Model.VO
+namespace HospitalInsurance.Model.VO.Web
 {
     /// <summary>
     /// 交易信息

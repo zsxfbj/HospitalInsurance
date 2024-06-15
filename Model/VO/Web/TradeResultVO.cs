@@ -1,7 +1,7 @@
 ﻿using HospitalInsurance.Utility.Converter;
 using Newtonsoft.Json;
 
-namespace HospitalInsurance.Model.VO
+namespace HospitalInsurance.Model.VO.Web
 {
     /// <summary>
     /// 门诊交易确认返回结果

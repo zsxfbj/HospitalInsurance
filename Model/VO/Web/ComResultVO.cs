@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace HospitalInsurance.Model.VO
+namespace HospitalInsurance.Model.VO.Web
 {
     /// <summary>
     /// Com组件返回的结果解析

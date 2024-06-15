@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace HospitalInsurance.Model.VO
+namespace HospitalInsurance.Model.VO.Web
 {
     /// <summary>
     /// 接口处理状态及错误消息对象

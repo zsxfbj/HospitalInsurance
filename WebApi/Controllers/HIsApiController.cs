@@ -3,6 +3,7 @@ using System.Web.Http;
 using HospitalInsurance.BLL;
 using HospitalInsurance.Model.Common;
 using HospitalInsurance.Model.DTO;
+using HospitalInsurance.Model.VO.Api;
 
 namespace HospitalInsurance.WebApi.Controllers
 {
@@ -24,7 +25,7 @@ namespace HospitalInsurance.WebApi.Controllers
             return new ApiResult<string>
             {
                 Code = Enums.ResultCodeEnum.Success,
-                Data = await BHISInterface.GetInstance().DivideFee(req)
+                Data = await BHISInterface.GetInstance().DivideFeeAsync(req)
             };
         }
 
@@ -40,7 +41,7 @@ namespace HospitalInsurance.WebApi.Controllers
             return new ApiResult<string>
             {
                 Code = Enums.ResultCodeEnum.Success,
-                Data = await BHISInterface.GetInstance().GetRefundTrade(req)              
+                Data = await BHISInterface.GetInstance().GetRefundTradeAsync(req)              
             };
         }
 
@@ -49,14 +50,30 @@ namespace HospitalInsurance.WebApi.Controllers
         /// </summary>
         /// <param name="tradeNumber">交易流水号</param>
         /// <returns>string 请求Id</returns>
-        [HttpPost]
+        [HttpGet]
         [Route("trade-state/{tradeNumber}")]
-        public async Task<ApiResult<string>> GetTradeState(string tradeNumber)
+        public async Task<ApiResult<string>> QueryTradeStateAsync(string tradeNumber)
         {
             return new ApiResult<string>
             {
                 Code = Enums.ResultCodeEnum.Success,
-                Data = await BHISInterface.GetInstance().GetTradeState(tradeNumber)              
+                Data = await BHISInterface.GetInstance().GetTradeStateAsync(tradeNumber)              
+            };
+        }
+
+        /// <summary>
+        /// 根据请求Id查询最终结果
+        /// </summary>
+        /// <param name="requestId">请求Id</param>
+        /// <returns>string 请求Id</returns>
+        [HttpGet]
+        [Route("trade-detail/{requestId}")]
+        public async Task<ApiResult<TradeDetailVO>> GetTradeDetailAsync(string requestId)
+        {
+            return new ApiResult<TradeDetailVO>
+            {
+                Code = Enums.ResultCodeEnum.Success,
+                Data = await BHISInterface.GetInstance().GetTradeDetailAsync(requestId)
             };
         }
     }
