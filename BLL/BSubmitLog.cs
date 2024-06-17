@@ -32,14 +32,10 @@ namespace HospitalInsurance.BLL
         /// <returns></returns>
         public async Task<SubmitLog> GetSubmitLogAsync(string requestId)
         {
-            await Task.Run(() =>
+            using (var context = new HCContext())
             {
-                using (var context = new HCContext())
-                {
-                  return context.SubmitLogs.FirstOrDefaultAsync(x=>x.RequestId == requestId);
-                }
-            } );
-            return null;
+                return await context.SubmitLogs.FirstOrDefaultAsync(x => x.RequestId == requestId);
+            }           
         }
     }
 }

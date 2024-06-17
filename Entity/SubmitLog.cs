@@ -11,15 +11,10 @@ namespace Hospitalinsurance.Entity
     public class SubmitLog
     {
         /// <summary>
-        /// 自增Id
-        /// </summary>
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
-
-        /// <summary>
         /// 请求业务Id
         /// </summary>
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string RequestId { get; set; }
 
 
@@ -57,8 +52,7 @@ namespace Hospitalinsurance.Entity
         /// 构造函数
         /// </summary>
         public SubmitLog()
-        {
-            Id = 0;
+        {             
             RequestId = Guid.NewGuid().ToString();
             SubmitType = 1;
             SubmitContent = "";

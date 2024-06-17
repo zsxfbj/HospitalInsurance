@@ -1,7 +1,6 @@
 ﻿using HospitalInsurance.Utility;
 using HospitalInsurance.Model.Common;
 using HospitalInsurance.Model.DTO;
-using HospitalInsurance.Model.VO;
 using Newtonsoft.Json;
 using HospitalInsurance.Enums;
 using Hospitalinsurance.Entity;
@@ -10,7 +9,6 @@ using HospitalInsurance.Model.VO.Api;
 using HospitalInsurance.Model.VO.Web;
 using System;
 using System.Text;
-using Newtonsoft.Json.Linq;
 
 namespace HospitalInsurance.BLL
 {
@@ -32,9 +30,15 @@ namespace HospitalInsurance.BLL
                 throw new ServiceException { ResultCode = Enums.ResultCodeEnum.RepeatAction, ErrorMessage = "频繁的提交费用分解数据" };
             }
             SubmitLog submitLog = new SubmitLog
-            {
+            {              
+                RequestId = Guid.NewGuid().ToString(),
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                Flag = 0,
+                ResultContent =  "",
                 SubmitType = 1,
                 SubmitContent = JsonConvert.SerializeObject(req)
+
             };
             await BSubmitLog.GetInstance().SaveAsync(submitLog);
             return submitLog.RequestId;
@@ -55,7 +59,12 @@ namespace HospitalInsurance.BLL
             }
 
             SubmitLog submitLog = new SubmitLog
-            {
+            {             
+                RequestId = Guid.NewGuid().ToString(),
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                Flag = 0,
+                ResultContent = "",
                 SubmitType = 2,
                 SubmitContent = JsonConvert.SerializeObject(req)
             };
@@ -81,7 +90,12 @@ namespace HospitalInsurance.BLL
                 throw new ServiceException { ResultCode = Enums.ResultCodeEnum.RepeatAction, ErrorMessage = "频繁的提交交易状态确认查询请求" };
             }
             SubmitLog submitLog = new SubmitLog
-            {
+            {                
+                RequestId = Guid.NewGuid().ToString(),
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                Flag = 0,
+                ResultContent = "",
                 SubmitType = 3,
                 SubmitContent = tradeNumber
             };
@@ -90,53 +104,19 @@ namespace HospitalInsurance.BLL
         }
         #endregion public TradeStateVO GetTradeState(string tradeNumber)
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="requestId"></param>
+        /// <returns></returns>
         public async Task<TradeDetailVO> GetTradeDetailAsync(string requestId)
-        {
-            TradeDetailVO tradeDetail = new TradeDetailVO
-            {
-                Success = ""
-            };
-
+        {  
             SubmitLog submitLog = await BSubmitLog.GetInstance().GetSubmitLogAsync(requestId);
             if(submitLog != null && !string.IsNullOrEmpty(submitLog.ResultContent))
             {
-
-                if(submitLog.SubmitType == 1)
-                {
-                    ComResultVO<TradeDivideVO> comResult = JsonConvert.DeserializeObject<ComResultVO<TradeDivideVO>>(submitLog.ResultContent);
-                    tradeDetail.Success = comResult.State.Success;
-                    if (tradeDetail.Success.Equals("true"))
-                    {
-                        tradeDetail.TradeNumber = comResult.Output.Trade.TradeNumber;
-                        tradeDetail.InInsuranceAmount = comResult.Output.SummaryPay.FundAmount.ToString("#0.####");
-                        tradeDetail.TotalAmount = comResult.Output.SummaryPay.TotalAmount.ToString("#0.####");
-                        StringBuilder sb = new StringBuilder();
-                        sb.Append("<![CDATA[");
-                        sb.Append(submitLog.ResultContent);
-                        sb.Append("]]>");
-                        tradeDetail.Result = Convert.ToBase64String(Encoding.UTF8.GetBytes(sb.ToString()));
-                    }
-                } 
-                else if(submitLog.SubmitType == 2)
-                {
-                    ComResultVO<RefundTradeResultVO> comResult = JsonConvert.DeserializeObject<ComResultVO<RefundTradeResultVO>>(submitLog.ResultContent);
-                    tradeDetail.Success = comResult.State.Success;
-                    if (tradeDetail.Success.Equals("true"))
-                    {
-                        tradeDetail.TradeNumber = comResult.Output.Trade.TradeNumber;
-                        tradeDetail.InInsuranceAmount = comResult.Output.SummaryPay.FundAmount.ToString("#0.####");
-                        tradeDetail.TotalAmount = comResult.Output.SummaryPay.TotalAmount.ToString("#0.####");
-                        StringBuilder sb = new StringBuilder();
-                        sb.Append("<![CDATA[");
-                        sb.Append(submitLog.ResultContent);
-                        sb.Append("]]>");
-                        tradeDetail.Result = Convert.ToBase64String(Encoding.UTF8.GetBytes(sb.ToString()));
-                    }
-                }                 
+                return JsonConvert.DeserializeObject<TradeDetailVO>(submitLog.ResultContent);                               
             }
-
-            return tradeDetail;
+            return null;
         }
 
     }

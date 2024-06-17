@@ -14,6 +14,12 @@ namespace HospitalInsurance.Model.VO.Api
         public string Success { get; set; }
 
         /// <summary>
+        /// 错误消息
+        /// </summary>
+        [JsonProperty("errMsg")]
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
         /// 医保交易号
         /// </summary>
         [JsonProperty("tradeNumber")]
@@ -36,7 +42,5 @@ namespace HospitalInsurance.Model.VO.Api
         /// </summary>
         [JsonProperty("result")]
         public string Result { get; set; }
-
-
     }
 }
