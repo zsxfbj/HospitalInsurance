@@ -4,17 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FD632311-2F7F-418A-AA51-7EC2178434E5}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HospitalInsurance.BLL</RootNamespace>
-    <AssemblyName>HospitalInsurance.BLL</AssemblyName>
+    <ProjectGuid>{AB8B7EE8-77F4-49A2-AF75-01151DB75C3A}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>HospitalInsurance.WinWebGateway</RootNamespace>
+    <AssemblyName>HospitalInsurance.WinWebGateway</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,45 +22,74 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <RegisterForComInterop>false</RegisterForComInterop>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>3</WarningLevel>
-    <RegisterForComInterop>false</RegisterForComInterop>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>WinWebGateway.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BActionCheck.cs" />
-    <Compile Include="BHISInterface.cs" />
-    <Compile Include="BSubmitLog.cs" />
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="App.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BLL\HospitalInsurance.BLL.csproj">
+      <Project>{fd632311-2f7f-418a-aa51-7ec2178434e5}</Project>
+      <Name>HospitalInsurance.BLL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Entity\HospitalInsurance.Entity.csproj">
       <Project>{94e18342-7b77-4433-b77c-a4ff7f5b2072}</Project>
       <Name>HospitalInsurance.Entity</Name>
     </ProjectReference>
     <ProjectReference Include="..\Enums\HospitalInsurance.Enums.csproj">
-      <Project>{ECD5D364-C875-4550-990A-5C105C9B735A}</Project>
+      <Project>{ecd5d364-c875-4550-990a-5c105c9b735a}</Project>
       <Name>HospitalInsurance.Enums</Name>
     </ProjectReference>
     <ProjectReference Include="..\Model\HospitalInsurance.Model.csproj">
@@ -68,7 +97,7 @@
       <Name>HospitalInsurance.Model</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utility\HospitalInsurance.Utility.csproj">
-      <Project>{A46340EE-1CE5-4B25-8BA0-A2352D40BEC4}</Project>
+      <Project>{a46340ee-1ce5-4b25-8ba0-a2352d40bec4}</Project>
       <Name>HospitalInsurance.Utility</Name>
     </ProjectReference>
   </ItemGroup>
