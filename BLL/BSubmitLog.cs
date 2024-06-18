@@ -16,12 +16,12 @@ namespace HospitalInsurance.BLL
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        public async Task<int> SaveAsync(SubmitLog entity)
+        public int Save(SubmitLog entity)
         {
             using (var context = new HCContext())
             {
                 context.SubmitLogs.Add(entity);
-                return await context.SaveChangesAsync();
+                return context.SaveChanges();
             }
         }        
 
@@ -30,11 +30,11 @@ namespace HospitalInsurance.BLL
         /// </summary>
         /// <param name="requestId"></param>
         /// <returns></returns>
-        public async Task<SubmitLog> GetSubmitLogAsync(string requestId)
+        public SubmitLog GetSubmitLog(string requestId)
         {
             using (var context = new HCContext())
             {
-                return await context.SubmitLogs.FirstOrDefaultAsync(x => x.RequestId == requestId);
+                return context.SubmitLogs.FirstOrDefault(x => x.RequestId == requestId);
             }           
         }
     }

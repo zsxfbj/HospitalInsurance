@@ -16,14 +16,14 @@ namespace HospitalInsurance.BLL
     /// 医保接口
     /// </summary>
     public class BHISInterface : Singleton<BHISInterface>
-    {    
-        #region public async Task<string> DivideFee(DivideReqDTO req)
+    {
+        #region public string DivideFee(DivideReqDTO req)
         /// <summary>
         /// 费用分解
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        public async Task<string> DivideFeeAsync(DivideReqDTO req)
+        public string DivideFee(DivideReqDTO req)
         {
             if (BActionCheck.GetInstance().IsRepeat("divide-fee-" + req.Person.CardNumber))
             {
@@ -40,10 +40,10 @@ namespace HospitalInsurance.BLL
                 SubmitContent = JsonConvert.SerializeObject(req)
 
             };
-            await BSubmitLog.GetInstance().SaveAsync(submitLog);
+            BSubmitLog.GetInstance().Save(submitLog);
             return submitLog.RequestId;
         }
-        #endregion public TradeVO DivideFee(DivideReqDTO req)
+        #endregion public string DivideFee(DivideReqDTO req)
 
         #region public Task<string> GetRefundTrade(RefundFeeReqDTO req)
         /// <summary>
@@ -51,7 +51,7 @@ namespace HospitalInsurance.BLL
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        public async Task<string> GetRefundTradeAsync(RefundmentReqDTO req)
+        public string GetRefundTrade(RefundmentReqDTO req)
         {
             if (BActionCheck.GetInstance().IsRepeat("refundment-" + req.Person.CardNumber))
             {
@@ -68,7 +68,7 @@ namespace HospitalInsurance.BLL
                 SubmitType = 2,
                 SubmitContent = JsonConvert.SerializeObject(req)
             };
-            await BSubmitLog.GetInstance().SaveAsync(submitLog);
+            BSubmitLog.GetInstance().Save(submitLog);
             return submitLog.RequestId;
         }
         #endregion public Task<string> GetRefundTrade(RefundFeeReqDTO req)
@@ -79,7 +79,7 @@ namespace HospitalInsurance.BLL
         /// </summary>
         /// <param name="tradeNumber"></param>
         /// <returns></returns>     
-        public async Task<string> GetTradeStateAsync(string tradeNumber)
+        public string GetTradeState(string tradeNumber)
         {
             if (string.IsNullOrEmpty(tradeNumber) || tradeNumber.Trim().Length > 22)
             {
@@ -99,7 +99,7 @@ namespace HospitalInsurance.BLL
                 SubmitType = 3,
                 SubmitContent = tradeNumber
             };
-            await BSubmitLog.GetInstance().SaveAsync(submitLog);
+            BSubmitLog.GetInstance().Save(submitLog);
             return submitLog.RequestId;
         }
         #endregion public TradeStateVO GetTradeState(string tradeNumber)
@@ -109,12 +109,23 @@ namespace HospitalInsurance.BLL
         /// </summary>
         /// <param name="requestId"></param>
         /// <returns></returns>
-        public async Task<TradeDetailVO> GetTradeDetailAsync(string requestId)
+        public TradeDetailVO GetTradeDetail(string requestId)
         {  
-            SubmitLog submitLog = await BSubmitLog.GetInstance().GetSubmitLogAsync(requestId);
-            if(submitLog != null && !string.IsNullOrEmpty(submitLog.ResultContent))
+            SubmitLog submitLog = BSubmitLog.GetInstance().GetSubmitLog(requestId);
+            if(submitLog != null)
             {
-                return JsonConvert.DeserializeObject<TradeDetailVO>(submitLog.ResultContent);                               
+                if (!string.IsNullOrEmpty(submitLog.ResultContent))
+                {
+                    return JsonConvert.DeserializeObject<TradeDetailVO>(submitLog.ResultContent);
+                }
+                else
+                {
+                    return new TradeDetailVO
+                    {
+                        Success = "",
+                        ErrorMessage = "暂无结果"
+                    };
+                }                                      
             }
             return null;
         }

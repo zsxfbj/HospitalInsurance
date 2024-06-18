@@ -10,7 +10,7 @@ namespace HospitalInsurance.WebApi.Controllers
     /// <summary>
     /// 移动互联网医院接口
     /// </summary>
-    [RoutePrefix("api/webyb")]
+    [Route("api/webyb")]
     public class HISApiController : ApiController
     {
         /// <summary>
@@ -20,12 +20,12 @@ namespace HospitalInsurance.WebApi.Controllers
         /// <returns>string 请求Id</returns>
         [HttpPost]
         [Route("divide")]
-        public async Task<ApiResult<string>> Divide([FromBody] DivideReqDTO req)
+        public ApiResult<string> Divide([FromBody] DivideReqDTO req)
         {
             return new ApiResult<string>
             {
                 Code = Enums.ResultCodeEnum.Success,
-                Data = await BHISInterface.GetInstance().DivideFeeAsync(req)
+                Data = BHISInterface.GetInstance().DivideFee(req)
             };
         }
 
@@ -36,12 +36,12 @@ namespace HospitalInsurance.WebApi.Controllers
         /// <returns>string 请求Id</returns>
         [HttpPost]
         [Route("refundment")]
-        public async Task<ApiResult<string>> Refundment([FromBody] RefundmentReqDTO req)
+        public ApiResult<string> Refundment([FromBody] RefundmentReqDTO req)
         {
             return new ApiResult<string>
             {
                 Code = Enums.ResultCodeEnum.Success,
-                Data = await BHISInterface.GetInstance().GetRefundTradeAsync(req)              
+                Data = BHISInterface.GetInstance().GetRefundTrade(req)              
             };
         }
 
@@ -52,12 +52,12 @@ namespace HospitalInsurance.WebApi.Controllers
         /// <returns>string 请求Id</returns>
         [HttpGet]
         [Route("trade-state/{tradeNumber}")]
-        public async Task<ApiResult<string>> QueryTradeStateAsync(string tradeNumber)
+        public ApiResult<string> QueryTradeState(string tradeNumber)
         {
             return new ApiResult<string>
             {
                 Code = Enums.ResultCodeEnum.Success,
-                Data = await BHISInterface.GetInstance().GetTradeStateAsync(tradeNumber)              
+                Data = BHISInterface.GetInstance().GetTradeState(tradeNumber)              
             };
         }
 
@@ -68,12 +68,21 @@ namespace HospitalInsurance.WebApi.Controllers
         /// <returns>string 请求Id</returns>
         [HttpGet]
         [Route("trade-detail/{requestId}")]
-        public async Task<ApiResult<TradeDetailVO>> GetTradeDetailAsync(string requestId)
+        public ApiResult<TradeDetailVO> GetTradeDetail(string requestId)
         {
+            TradeDetailVO tradeDetail = BHISInterface.GetInstance().GetTradeDetail(requestId);
+            if(tradeDetail == null)
+            {
+                return new ApiResult<TradeDetailVO>
+                {
+                    Code = Enums.ResultCodeEnum.NotFound,
+                    ErrorMessage = "记录不存在"
+                };
+            }
             return new ApiResult<TradeDetailVO>
             {
                 Code = Enums.ResultCodeEnum.Success,
-                Data = await BHISInterface.GetInstance().GetTradeDetailAsync(requestId)
+                Data = tradeDetail
             };
         }
     }
