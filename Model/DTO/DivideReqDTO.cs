@@ -28,6 +28,11 @@ namespace HospitalInsurance.Model.DTO
         [JsonProperty("operator")]
         public string Operator { get; set; }
 
+        /// <summary>
+        /// 处方类型：1-医保内处方；2-医保外处方
+        /// </summary>        
+        [JsonProperty("recipeType")]
+        public int RecipeType { get; set; }
 
         /// <summary>
         /// 处方时间，格式为yyyyMMddHHmmss
@@ -46,6 +51,12 @@ namespace HospitalInsurance.Model.DTO
         /// </summary>       
         [JsonProperty("sectionName")]
         public string SectionName { get; set; }
+
+        /// <summary>
+        /// HIS就诊科别名称
+        /// </summary>
+        [JsonProperty("hisSectionName")]
+        public string HisSectionName { get; set; }
 
         /// <summary>
         /// 医师编码，北京市卫生局标准15位，部队16位，严禁使用汉字。
